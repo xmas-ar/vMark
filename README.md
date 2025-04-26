@@ -10,8 +10,8 @@
 
 - Throughput / Latency / Frame Loss (RFC 2544).
 - Back-to-Back and Jitter Testing.
-- 24/7 Service Assurance sessions (oBFDD).
-- Packet Delay Variation (PDV) for voice/video service assurance
+- 24/7 Service Assurance sessions (XDP BFD implementation).
+- Packet Delay Variation (PDV) for voice/video service assurance. 
 - Path MTU Discovery (detect fragmentation issues)
 
 **2. Passive Monitoring Features**
