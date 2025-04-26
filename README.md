@@ -1,7 +1,7 @@
 <h1 align="center">vMark by Pathgate</h1>
 <h2 align="center">Ethernet demarcation management system for <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints</h2>
 
-![image](https://github.com/user-attachments/assets/f1d60f02-533f-4fa0-9e64-d758ee14614b)
+![WhatsApp Image 2025-04-25 at 18 52 09_84bb6512](https://github.com/user-attachments/assets/aba9962c-a8a8-4a04-bc2c-e073c5f72b37)
 
 
 **Feature roadmap:**
