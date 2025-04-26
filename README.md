@@ -17,6 +17,8 @@
 **2. Passive Monitoring Features**
 
 - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
+- Heartbeat node monitoring.
+- Ethernet OAM.
 - Real-Time Packet Capture (Wireshark-style exports)
 - Live Traffic Statistics (bandwidth per port, errors, discards, CRCs, etc.)
 - Interface Health Monitoring (up/down, speed mismatches, duplex mismatches)
