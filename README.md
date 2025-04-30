@@ -59,6 +59,33 @@
 <h2 align="center"></h2>
 <h1 align="center"># Overview</h1>
 
+<p align="center">vMark is an open-source Ethernet demarcation orchestration system, designed for flexibility and democratization in the Carrier industry.</p>
+
+<p align="center">The endpoints managed by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints. </p>
+
+
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a0ff9c06-6466-40df-bda7-70f73f2d7bf9" alt="xxx">
+</p>
+
+<h1 align="center"># Architecture</h1>
+
+**Web Frontend:**
+Provides the user interface for monitoring and managing registered vMark-node instances. Built with **React**, **TypeScript**, and **Vite**, styled with **Tailwind CSS**, and uses **Recharts** for data visualization. It allows users to view node status, configure settings, and visualize performance data like latency.
+
+**Backend API:**
+The core engine built with **FastAPI** (Python). It handles requests from the Web Frontend, manages node registration and authentication, interacts with the database, and orchestrates communication with individual vMark-node instances.
+
+**Database:**
+Stores persistent data including registered node details (IP, capabilities, status, registration tokens), user accounts, historical latency data, and system configuration. Uses **SQLite** accessed via **SQLModel** (Python ORM).
+
+**Heartbeat Service:**
+A background **asyncio** task running within the FastAPI application. It's responsible for periodically checking the status and collecting latency information from all registered vMark-node instances via their respective APIs using **httpx**.
+
+**Node Communication Layer:**
+Handles the secure API interactions between the vMark server (using **httpx** within the Backend API and Heartbeat Service) and the individual vMark-node instances, facilitating remote command execution and data retrieval.
+
 ___
 
 ## Quick Install
