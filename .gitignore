@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend/venv/  # Or your virtual environment folder name
+*.env
+.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+vmark.db # Explicitly ignore your local db file
+
+# Frontend Build Artifacts & Dependencies
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE/OS specific
+.vscode/
+.idea/
+*.DS_Store
