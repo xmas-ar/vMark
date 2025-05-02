@@ -6,7 +6,7 @@
 
 **Feature roadmap:**
 
-**1. Active Testing Features:**
+**1. Benchmarks:**
 
 - Throughput / Latency / Frame Loss (RFC 2544).
 - Back-to-Back and Jitter Testing.
@@ -14,7 +14,7 @@
 - Packet Delay Variation (PDV) for voice/video service assurance. 
 - Path MTU Discovery (detect fragmentation issues)
 
-**2. Passive Monitoring Features**
+**2. Performance Assurance**
 
 - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
 - Heartbeat node monitoring.
