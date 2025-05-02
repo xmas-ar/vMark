@@ -6,7 +6,7 @@
 **🚀 Features:**
 - Node Management: CRUD operations.
 - Heartbeat sensor (last 24hs)
-- Node Filtering & Search: Added options to filter nodes by status (All, Online, Offline) and search nodes by their ID.
+- Node Filtering & Search.
 - Docker deployment.
 
 
