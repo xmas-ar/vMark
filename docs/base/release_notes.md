@@ -7,4 +7,4 @@
 *   **Latency Visualization:** Implemented a chart to display node latency/heartbeat data. Users can select time ranges (2h, 6h, 12h, 24h).
 *   **Node Filtering & Search:** Added options to filter nodes by status (All, Online, Offline) and search nodes by their ID.
 *   **Backend API:** Established the core FastAPI backend to support UI operations and node communication.
-*   Initial setup for serving the frontend and backend via Docker ([vMark/Dockerfile](vMark/Dockerfile)).
+*   Initial setup for serving the frontend and backend via Docker
