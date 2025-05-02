@@ -1,7 +1,75 @@
 <h1 align="center">vMark by Pathgate</h1>
 <h2 align="center">Ethernet demarcation management system for <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints</h2>
 
-<p align="center">Latest version: 0.1.1 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/public/docs/base/release_notes.md">Link</a> </p>
+<p align="center">Latest version: 0.1.1 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> </p>
+
+**🚀 Features:**
+- Node Management: CRUD operations.
+- Heartbeat sensor (last 24hs)
+- Node Filtering & Search: Added options to filter nodes by status (All, Online, Offline) and search nodes by their ID.
+- Docker deployment.
+
+
+<details>
+  <summary>Feature roadmap</summary>
+  
+  
+  ```
+   1. Benchmarks:
+  
+  - Throughput / Latency / Frame Loss (RFC 2544).
+  - Back-to-Back and Jitter Testing.
+  - 24/7 Service Assurance sessions (XDP BFD implementation).
+  - Packet Delay Variation (PDV) for voice/video service assurance. 
+  - Path MTU Discovery (detect fragmentation issues)
+  
+  2. Performance Assurance
+  
+  - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
+  - Heartbeat node monitoring.
+  - Ethernet OAM.
+  - Real-Time Packet Capture (Wireshark-style exports)
+  - Live Traffic Statistics (bandwidth per port, errors, discards, CRCs, etc.)
+  - Interface Health Monitoring (up/down, speed mismatches, duplex mismatches)
+  
+  3. Automation and Analytics
+  
+  - Remote vMark MEF Ethernet services deployment & monitoring.
+  - Orchestation of vMark-nodes features.
+  - Scheduled Tests (hourly, daily, during maintenance windows)
+  - Threshold-Based Alerts (ex: latency > 5 ms triggers an alert)
+  - Historical Data Storage (keep performance logs for weeks/months)
+  - Trend Analysis and Forecasting (basic AI/ML for predicting future problems)
+  - Topology Awareness (map results back to logical/physical network maps)
+  - Dynamic Baseline Learning
+  
+  4. Protocol Support and Flexibility
+  
+  - IPv4 and IPv6
+  - VLAN, QinQ, MPLS, Segment Routing aware
+  - Option for encrypted link testing (IPSec, MACsec links)
+  - MEF3 compliance.
+  
+  5. UX and Integrations
+  
+  - Web UI Dashboards.
+  - CLI Access.
+  - API (REST/gRPC) for integration with orchestration tools.
+  - Multi-Tenant Support (so multiple users can run tests in parallel)
+  - Authentication/Authorization (LDAP, OIDC)
+  - Report Generation (PDF/HTML reports after test runs)
+  
+  6. Advanced Features:
+  
+  - Impairment Simulation (add artificial delay/loss/jitter to links)
+  - Adaptive Testing (tests change dynamically based on live results)
+  - Multi-Hop Path Tracing (reverse traceroute with performance metrics)
+  ```
+  
+</details>
+
+
+___
 
 ![WhatsApp Image 2025-04-25 at 18 52 09_84bb6512](https://github.com/user-attachments/assets/aba9962c-a8a8-4a04-bc2c-e073c5f72b37)
 
@@ -38,13 +106,13 @@ Handles the secure API interactions between the vMark server (using **httpx** wi
 
 ___
 
-## Installation Methods
+<h1 align="center">📎 Installation methods</h1>
 
 You can install and run vMark using either Docker (recommended for ease of use) or by setting up the frontend and backend manually.
 
 ___
 
-### Method 1: Docker Installation (Recommended)
+### Method 1: Docker Installation 🔄 (Recommended)
 
 This method requires Docker to be installed on your system.
 
@@ -62,7 +130,7 @@ docker run -d -p 8000:8000 --name vmark xmas-ar/vmark:v0.1.1
 3.  **Access vMark:** Open your web browser and navigate to `http://localhost:8000`.
 
 ___
-### Method 2: Manual Installation
+### Method 2: Manual Installation ✅
 
 This method requires Python, Node.js, and npm to be installed.
 
@@ -107,57 +175,3 @@ Open your web browser and navigate to `http://localhost:8000` (or the IP/port wh
 If using the frontend dev server, access it at its specific address (e.g., `http://localhost:5173`).
 
 ```
-
-__
-
-**Feature roadmap:**
-
-**1. Benchmarks:**
-
-- Throughput / Latency / Frame Loss (RFC 2544).
-- Back-to-Back and Jitter Testing.
-- 24/7 Service Assurance sessions (XDP BFD implementation).
-- Packet Delay Variation (PDV) for voice/video service assurance. 
-- Path MTU Discovery (detect fragmentation issues)
-
-**2. Performance Assurance**
-
-- Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
-- Heartbeat node monitoring.
-- Ethernet OAM.
-- Real-Time Packet Capture (Wireshark-style exports)
-- Live Traffic Statistics (bandwidth per port, errors, discards, CRCs, etc.)
-- Interface Health Monitoring (up/down, speed mismatches, duplex mismatches)
-
-**3. Automation and Analytics**
-
-- Remote vMark MEF Ethernet services deployment & monitoring.
-- Orchestation of vMark-nodes features.
-- Scheduled Tests (hourly, daily, during maintenance windows)
-- Threshold-Based Alerts (ex: latency > 5 ms triggers an alert)
-- Historical Data Storage (keep performance logs for weeks/months)
-- Trend Analysis and Forecasting (basic AI/ML for predicting future problems)
-- Topology Awareness (map results back to logical/physical network maps)
-- Dynamic Baseline Learning
-
-**4. Protocol Support and Flexibility**
-
-- IPv4 and IPv6
-- VLAN, QinQ, MPLS, Segment Routing aware
-- Option for encrypted link testing (IPSec, MACsec links)
-- MEF3 compliance.
-
-**5. UX and Integrations**
-
-- Web UI Dashboards.
-- CLI Access.
-- API (REST/gRPC) for integration with orchestration tools.
-- Multi-Tenant Support (so multiple users can run tests in parallel)
-- Authentication/Authorization (LDAP, OIDC)
-- Report Generation (PDF/HTML reports after test runs)
-
-**6. Advanced Features:**
-
-- Impairment Simulation (add artificial delay/loss/jitter to links)
-- Adaptive Testing (tests change dynamically based on live results)
-- Multi-Hop Path Tracing (reverse traceroute with performance metrics)
