@@ -19,52 +19,46 @@
   
   - Throughput / Latency / Frame Loss (RFC 2544).
   - Back-to-Back and Jitter Testing.
-  - 24/7 Service Assurance sessions (XDP BFD implementation).
   - Packet Delay Variation (PDV) for voice/video service assurance. 
   - Path MTU Discovery (detect fragmentation issues)
   
   2. Performance Assurance
   
-  - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
+  - 24/7 Service Assurance sessions (XDP BFD implementation).
   - Heartbeat node monitoring.
   - Ethernet OAM. (IEEE 802.1ag / Y.1731)
+  
+  3. Automation
+  
+  - Remote vMark MEF Ethernet services deployment & monitoring.
+  - Scheduled Tests (hourly, daily, during maintenance windows)
+  - Threshold-Based Alerts (ex: latency > 5 ms triggers an alert)
+  - Trend Analysis and Forecasting (AI/ML for predicting future problems, suggest fixes)
+  - Dynamic Baseline Learning
+
+  4. Observability metrics
+  - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
   - Real-Time Packet Capture (Wireshark-style exports)
   - Live Traffic Statistics (bandwidth per port, errors, discards, CRCs, etc.)
   - Interface Health Monitoring (up/down, speed mismatches, duplex mismatches)
-  - Timing protocols support (ITU-T G.8262 Sync-E and IEEE 1588v2)
   
-  3. Automation and Analytics
-  
-  - Remote vMark MEF Ethernet services deployment & monitoring.
-  - Orchestation of vMark-nodes features.
-  - Scheduled Tests (hourly, daily, during maintenance windows)
-  - Threshold-Based Alerts (ex: latency > 5 ms triggers an alert)
-  - Historical Data Storage (keep performance logs for weeks/months)
-  - Trend Analysis and Forecasting (basic AI/ML for predicting future problems)
-  - Topology Awareness (map results back to logical/physical network maps)
-  - Dynamic Baseline Learning
-  
-  4. Protocol Support and Flexibility
+  5. Protocol Support and Flexibility
   
   - IPv4 and IPv6
   - VLAN, QinQ, MPLS, Segment Routing aware
   - Option for encrypted link testing (IPSec, MACsec links)
   - MEF3 compliance.
+  - Timing protocols support (ITU-T G.8262 Sync-E and IEEE 1588v2)
   
   5. UX and Integrations
   
-  - Web UI Dashboards.
-  - CLI Access.
-  - API (REST/gRPC) for integration with orchestration tools.
   - Multi-Tenant Support (so multiple users can run tests in parallel)
   - Authentication/Authorization (LDAP, OIDC)
   - Report Generation (PDF/HTML reports after test runs)
   
   6. Advanced Features:
   
-  - Impairment Simulation (add artificial delay/loss/jitter to links)
-  - Adaptive Testing (tests change dynamically based on live results)
-  - Multi-Hop Path Tracing (reverse traceroute with performance metrics)
+  - Adaptive holistic Testing (group tests report that changes dynamically based on live results)
   ```
   
 </details>
