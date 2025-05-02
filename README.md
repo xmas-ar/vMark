@@ -27,10 +27,11 @@
   
   - Flow Export and Analysis (NetFlow, sFlow, IPFIX support)
   - Heartbeat node monitoring.
-  - Ethernet OAM.
+  - Ethernet OAM. (IEEE 802.1ag / Y.1731)
   - Real-Time Packet Capture (Wireshark-style exports)
   - Live Traffic Statistics (bandwidth per port, errors, discards, CRCs, etc.)
   - Interface Health Monitoring (up/down, speed mismatches, duplex mismatches)
+  - Timing protocols support (ITU-T G.8262 Sync-E and IEEE 1588v2)
   
   3. Automation and Analytics
   
