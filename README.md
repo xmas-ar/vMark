@@ -25,8 +25,7 @@
   2. Performance Assurance
   
   - 24/7 Service Assurance sessions (XDP BFD implementation).
-  - Heartbeat node monitoring.
-  - Ethernet OAM. (IEEE 802.1ag / Y.1731)
+  - Ethernet OAM CFM/LFM. (IEEE 802.1ag / Y.1731)
   
   3. Automation
   
