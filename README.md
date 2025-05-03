@@ -1,6 +1,4 @@
 <h1 align="center">vMark by Pathgate</h1>
-<h2 align="center">Ethernet demarcation management system for <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints</h2>
-
 <p align="center">Latest version: 0.1.2 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> </p>
 
 **🚀 Features:**
@@ -63,22 +61,18 @@
 </details>
 
 
-___
-
-![WhatsApp Image 2025-04-25 at 18 52 09_84bb6512](https://github.com/user-attachments/assets/aba9962c-a8a8-4a04-bc2c-e073c5f72b37)
-
 
 <h2 align="center"></h2>
 <h1 align="center"># Overview</h1>
 
-<p align="center">vMark is an open-source Ethernet demarcation orchestration system, designed for flexibility and democratization in the Carrier industry.</p>
+<p align="center">vMark is an open-source Ethernet demarcation system, designed for flexibility and democratization in the Carrier industry.</p>
 
-<p align="center">The endpoints managed by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints. </p>
+<p align="center">The endpoints orchestrated by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> instances. </p>
 
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/a0ff9c06-6466-40df-bda7-70f73f2d7bf9" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/97057738-dc94-4750-bfc9-4cc29fe9bdb4" alt="xxx">
 </p>
 
 <h1 align="center"># Architecture</h1>
