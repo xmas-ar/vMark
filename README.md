@@ -9,6 +9,7 @@
 
 
 <details>
+
   <summary>Feature roadmap</summary>
   
   
@@ -65,14 +66,13 @@
 <h2 align="center"></h2>
 <h1 align="center"># Overview</h1>
 
+
 <p align="center">vMark is an open-source Ethernet demarcation system, designed for flexibility and democratization in the Carrier industry.</p>
 
 <p align="center">The endpoints orchestrated by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> instances. </p>
 
-
-
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/97057738-dc94-4750-bfc9-4cc29fe9bdb4" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/7fdd6b44-1487-4f3f-b550-6cd5eabef46f" alt="xxx">
 </p>
 
 <h1 align="center"># Architecture</h1>
