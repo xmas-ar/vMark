@@ -1,3 +1,7 @@
+# vMark Release Notes - v0.1.2
+
+- Bug fixes to styling and async function for node info fetching.
+
 # vMark Release Notes - v0.1.1
 
 ## ✨ New Features

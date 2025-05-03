@@ -73,7 +73,7 @@ export default function App() {
   const [nodeForm, setNodeForm] = useState<NodeForm>({
     node_id: '', ip: '', tags: '', auth_token: '', port: '1050' // Rename capabilities to tags
   });
-  const [version, setVersion] = useState<string>("v0.1.0");
+  const [version, setVersion] = useState<string>("v0.1.2");
   // Ref to track nodes currently being preloaded to avoid redundant fetches
   const preloadingNodes = useRef<Set<string>>(new Set());
 
@@ -155,29 +155,36 @@ export default function App() {
   }, [latencyCache, selectedNode?.id, timeRange]); // Dependencies for fetchLatency
 
 
-  // Fetch Nodes (modified to trigger preload)
-  const fetchNodes = useCallback(() => {
-    fetch(`${API_BASE_URL}/nodes`)
-      .then(res => res.ok ? res.json() : Promise.reject(`HTTP error! status: ${res.status}`))
-      .then((data: NodeInfo[]) => {
-        if (!Array.isArray(data)) throw new Error('Invalid node data format');
-        setNodes(data);
-        // Trigger preload for all nodes for the current timeRange
-        data.forEach(node => {
-            // Fetch only if not already cached recently (optional optimization)
-            const cacheKey = `${node.id}-${timeRange}`;
-            const cached = latencyCache[cacheKey];
-            const now = Date.now();
-            if (!cached || (now - cached.lastUpdated) >= 30000) { // Preload if cache missing or older than 30s
-               fetchLatency(node.id, timeRange, false, true); // isPreload = true
-            }
-        });
-      })
-      .catch(error => {
-        console.error('Error fetching nodes:', error);
-        setNodes([]);
-      });
-  }, [fetchLatency, timeRange, latencyCache]); // Add fetchLatency, timeRange, latencyCache dependencies
+  // Helper function to introduce a delay
+  const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+  // Fetch Nodes (modified to stagger preload)
+  const fetchNodes = useCallback(async () => { // Make the callback async
+    try {
+      const res = await fetch(`${API_BASE_URL}/nodes`); // Use await
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`); // Throw error on bad response
+
+      const data: NodeInfo[] = await res.json(); // Use await
+      if (!Array.isArray(data)) throw new Error('Invalid node data format');
+
+      setNodes(data);
+
+      // Staggered preload for all nodes for the current timeRange
+      for (const node of data) { // Use for...of loop with await
+          const cacheKey = `${node.id}-${timeRange}`;
+          const cached = latencyCache[cacheKey];
+          const now = Date.now();
+          if (!cached || (now - cached.lastUpdated) >= 30000) { // Preload if cache missing or older than 30s
+             // Don't await fetchLatency itself, let them run in background, but wait before starting the next one
+             fetchLatency(node.id, timeRange, false, true); // isPreload = true
+             await sleep(100); // Wait 100ms before starting the next preload fetch
+          }
+      }
+    } catch (error) {
+      console.error('Error fetching nodes:', error);
+      setNodes([]); // Clear nodes on error
+    }
+  }, [fetchLatency, timeRange, latencyCache]); // Keep dependencies
 
   const fetchVersion = useCallback(() => {
     // ... (fetchVersion remains the same) ...
@@ -332,8 +339,8 @@ export default function App() {
          throw new Error(errorData.detail || 'Failed to add node');
       }
       setNodeForm({ node_id: '', ip: '', tags: '', auth_token: '', port: '1050' }); // Reset form, rename capabilities to tags
-      setModalType(null); // Close modal
-      fetchNodes(); // Refresh node list
+      setModalType(null); // Close modal immediately
+      // fetchNodes(); // Remove this immediate refresh call
     } catch (error: any) {
       console.error('Error adding node:', error);
       alert(`Failed to add node: ${error.message}`);

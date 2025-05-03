@@ -1,7 +1,7 @@
 <h1 align="center">vMark by Pathgate</h1>
 <h2 align="center">Ethernet demarcation management system for <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> endpoints</h2>
 
-<p align="center">Latest version: 0.1.1 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> </p>
+<p align="center">Latest version: 0.1.2 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> </p>
 
 **🚀 Features:**
 - Node Management: CRUD operations.
@@ -113,12 +113,12 @@ This method requires Docker to be installed on your system.
 1.  **Pull the Docker Image:**
 
 ```
-docker pull xmasar/vmark:v0.1.1
+docker pull xmasar/vmark:v0.1.2
 ```
 
 2.  **Run the Docker Container:**
 ```
-docker run -d -p 8000:8000 --name vmark xmasar/vmark:v0.1.1
+docker run -d -p 8000:8000 --name vmark xmasar/vmark:v0.1.2
 ```
 
 3.  **Access vMark:** Open your web browser and navigate to `http://localhost:8000`.
