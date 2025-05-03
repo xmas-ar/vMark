@@ -154,11 +154,14 @@ npm run build              # Build static frontend files (output to frontend/dis
 cd ..                      # Go back to the root vMark directory
 ```
 
-4.  **Run Backend Server:**
+4.  **Run Backend & Frontend Server:**
 
 ```
 From the `vMark` root directory:
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+
+and from frontend directory:
+npx vite --host
 ```
 
 
