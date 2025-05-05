@@ -1,5 +1,5 @@
 <h1 align="center">vMark by Pathgate</h1>
-<p align="center">Latest version: 0.1.2 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> </p>
+<p align="center">Latest version: 0.1.2 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://github.com/xmas-ar/vMark-node/blob/public/docs/base/release_notes.md">LinkedIn</a> </p></p>
 
 **🚀 Features:**
 - Node Management: CRUD operations.
