@@ -1,10 +1,11 @@
 <h1 align="center">vMark by Pathgate</h1>
-<p align="center">Latest version: 0.1.2 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
+<p align="center">Latest version: 0.1.3 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
 
 **🚀 Features:**
-- Node Management: CRUD operations.
+- Ad-hoc RFC 5357 (TWAMP) Benchmarks
+- Node Management
 - Heartbeat sensor (last 24hs)
-- Node Filtering & Search.
+- Node Filtering & Tags-based Search.
 - Docker deployment.
 
 
