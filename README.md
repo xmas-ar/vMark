@@ -1,5 +1,5 @@
 <h1 align="center">vMark by Pathgate</h1>
-<p align="center">Latest version: 0.1.3 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
+<p align="center">Latest version: 0.1.4 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
 
 **🚀 Features:**
 - Ad-hoc RFC 5357 (TWAMP) Benchmarks
@@ -132,36 +132,59 @@ This method requires Python, Node.js, and npm to be installed.
 git clone https://github.com/xmas-ar/vMark
 ```
 
-2.  **Set up Backend:**
+2.  **Set up Frontend:**
+
+```
+cd frontend
+npm install                # Install Node.js dependencies
+npm run build              # Build static frontend files (output to frontend/dist
+cd ..                      # Go back to the root vMark directory
+```
+
+3.  **Set up Backend & DB:**
 
 ```
 cd backend
 python3 -m venv venv        # Create a virtual environment
 source venv/bin/activate
 pip install -r requirements.txt # Install Python dependencies
-# Initialize database if needed (e.g., python init_db.py)
 cd ..                      # Go back to the root vMark directory
+# Initialize database:
+PYTHONPATH=. python backend/init_db.py
+python -m backend.init_db
 ```
 
-3.  **Set up Frontend:**
-
+4.  **Modify line 17 in backend/main.py from:**
 ```
-cd frontend
-npm install                # Install Node.js dependencies
-npm run build              # Build static frontend files (output to frontend/dist)
-cd ..                      # Go back to the root vMark directory
+STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), "frontend/dist")
 ```
-
-4.  **Modify line 17 in backend/main.py to:** (termporal fix, will be removed in further versions).
+**to:** (temporal fix, will be removed in further versions).
 ```
 STATIC_FILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
 ```
 
-5.  **Run Backend & Frontend Server:**
+5.  **Modify line 11 in frontend/App.tsx and line 8 in config.py from:**
+```
+const API_BASE_URL = '/api';
+```
+**to:**
+```
+const API_BASE_URL = 'http://<IPADDRESS>:8000/api';
+```
+**config.py:**
+```
+DEFAULT_ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://192.168.178.119:5173"
+```
+**to:**
+```
+DEFAULT_ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://<IPADDRESS>:5173"
+```
+  
+6.  **Run Backend & Frontend Server:**
 
 ```
 From the `vMark` root directory and with Virtual environment activated:
-uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn backend.main:app --host <IPADDRESS> --reload
 
 and from frontend directory:
 npm run dev -- --host <IPADDRESS>
@@ -171,7 +194,6 @@ npm run dev -- --host <IPADDRESS>
 5.  **Access vMark:**
 
 ```
-Open your web browser and navigate to `http://localhost:8000` (or the IP/port where the backend is running).
-If using the frontend dev server, access it at its specific address (e.g., `http://localhost:5173`).
+Open your web browser and navigate to `http://localhost:5173` (or the IP/port where the frontend is running).
 
 ```
