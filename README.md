@@ -173,7 +173,7 @@ const API_BASE_URL = 'http://<IPADDRESS>:8000/api';
 ```
 **config.py:**
 ```
-DEFAULT_ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173,http://192.168.178.119:5173"
+DEFAULT_ALLOWED_ORIGINS = "http://localhost:5173,http://127.0.0.1:5173"
 ```
 **to:**
 ```
