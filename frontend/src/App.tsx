@@ -110,7 +110,7 @@ export default function App() {
   const [nodeForm, setNodeForm] = useState<NodeForm>({
     node_id: '', ip: '', tags: '', auth_token: '', port: '1050' // Rename capabilities to tags
   });
-  const [version, setVersion] = useState<string>("v0.1.3");
+  const [version, setVersion] = useState<string>("v0.1.4");
   const [isSidebarLocked, setIsSidebarLocked] = useState(false); // <-- Add this state
   // Ref to track nodes currently being preloaded to avoid redundant fetches
   const preloadingNodes = useRef<Set<string>>(new Set());

@@ -1,4 +1,4 @@
-# vMark Release Notes - v0.1.3
+# vMark Release Notes - v0.1.3/4
 
 **New Features:**
 - Added a lockable sidebar menu with categorized tabs for improved navigation.
@@ -11,6 +11,7 @@
 
 - Optimized heartbeat graph rendering for better performance at scale.
 - Added useful external and internal links in the footer section.
+- Bug fixes
 
 # vMark Release Notes - v0.1.2
 
