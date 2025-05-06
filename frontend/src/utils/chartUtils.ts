@@ -1,17 +1,20 @@
-import { FormattedLatencyData } from '../types';
-import { RawLatencyData } from '../types';
+import { FormattedLatencyData, RawLatencyData } from '../types'; // Ensure RawLatencyData is imported if needed elsewhere
 
-// --- optimizeChartData function (lines 72-146 from App.tsx) ---
-export function optimizeChartData(data: FormattedLatencyData[], maxPoints = 200): FormattedLatencyData[] { // Increased default maxPoints based on previous change
+// --- optimizeChartData function ---
+export function optimizeChartData(data: FormattedLatencyData[], maxPoints = 200): FormattedLatencyData[] {
   if (!data || data.length === 0) return [];
 
-  // Adjust actualMaxPoints based on data size if needed (optional)
-  const actualMaxPoints = data.length > 1000 ? 100 : maxPoints; // Example adjustment
-  if (data.length <= actualMaxPoints) return data;
+  // Use the passed maxPoints directly as the target.
+  // The existing check below handles cases where data is already sparser than maxPoints.
+  const actualMaxPoints = maxPoints;
 
-  // Calculate skip based on actualMaxPoints
+  // If data length is already less than or equal to the desired maxPoints,
+  // no optimization is needed, or we can't make it more detailed than it is.
+  if (data.length <= actualMaxPoints) {
+    return data;
+  }
+
   const skip = Math.ceil(data.length / actualMaxPoints);
-
   const result: FormattedLatencyData[] = [];
   let lastValue: number | null = null;
   let sumSinceLastSample = 0;
@@ -19,72 +22,55 @@ export function optimizeChartData(data: FormattedLatencyData[], maxPoints = 200)
 
   for (let i = 0; i < data.length; i++) {
     const currentPoint = data[i];
-    const currentLatency = currentPoint.latency;
-    const prevPointLatency = data[i-1]?.latency; // Get previous point's latency
+    const currentLatency = currentPoint.latency_ms;
+    const prevPointLatency = data[i-1]?.latency_ms;
 
-    // Always keep the very first point
     if (i === 0) {
       result.push(currentPoint);
       lastValue = currentLatency;
       continue;
     }
 
-    // --- Handling Null (Offline) Transitions ---
-    // 1. If current is null (start or continuation of downtime)
     if (currentLatency === null) {
-      // If the *previous* point was NOT null, we are transitioning TO offline.
-      // Add the average of points since the last sample *before* this null point.
       if (prevPointLatency !== null && countSinceLastSample > 0) {
          const avgLatency = sumSinceLastSample / countSinceLastSample;
-         // Use the previous point's time for the average representation
-         result.push({ time: data[i-1].time, latency: avgLatency });
+         result.push({ time: data[i-1].time, latency_ms: avgLatency });
       }
-      // Always add the null point itself to mark downtime
-      if (result[result.length - 1]?.time !== currentPoint.time) { // Avoid duplicates if avg was just added
+      if (result.length === 0 || result[result.length - 1]?.time !== currentPoint.time) {
           result.push(currentPoint);
       }
       lastValue = null;
       sumSinceLastSample = 0;
       countSinceLastSample = 0;
-      continue; // Move to next point
+      continue;
     }
 
-    // --- Handling Non-Null (Online) Points ---
-    // 2. If current is NOT null, but the *previous* point WAS null (transition FROM offline)
-    // We MUST keep this point to mark the end of downtime accurately.
     const justCameOnline = prevPointLatency === null && currentLatency !== null;
 
-    // Accumulate for averaging
     sumSinceLastSample += currentLatency;
     countSinceLastSample++;
 
-    // Determine if we should add a point based on skip, significant change, end, or transition
-    const significantChange = lastValue !== null && Math.abs(currentLatency - lastValue) > (lastValue * 0.25); // Example threshold
+    const significantChange = lastValue !== null && Math.abs(currentLatency - lastValue) > (lastValue * 0.25); // Heuristic for significant change
     const isLastPoint = i === data.length - 1;
-    const nextPointIsNull = data[i+1]?.latency === null; // Keep point before downtime starts
+    const nextPointIsNull = data[i+1]?.latency_ms === null;
 
     if (
-        justCameOnline ||          // Always keep the first point after downtime
-        i % skip === 0 ||          // Keep based on regular sampling interval
-        significantChange ||       // Keep if latency changed significantly
-        nextPointIsNull ||         // Keep the last point before downtime
-        isLastPoint                // Always keep the very last point
+        justCameOnline ||
+        i % skip === 0 ||
+        significantChange ||
+        nextPointIsNull ||
+        isLastPoint
     ) {
-      // Calculate average latency since the last kept point
       const avgLatency = countSinceLastSample > 0
         ? sumSinceLastSample / countSinceLastSample
-        : currentLatency; // Should not happen if countSinceLastSample is 0, but fallback
+        : currentLatency; // Should be currentLatency if count is 0
 
-      // Add the averaged point (or the specific point if justCameOnline/significantChange?)
-      // Using the current time is generally best here.
       result.push({
         time: currentPoint.time,
-        latency: avgLatency // Using average smooths the line between kept points
-        // Alternatively, for justCameOnline, you might want the exact value:
-        // latency: justCameOnline ? currentLatency : avgLatency
+        latency_ms: avgLatency
       });
 
-      lastValue = currentLatency; // Update last kept value
+      lastValue = currentLatency; // Update lastValue with the actual current latency, not average
       sumSinceLastSample = 0;
       countSinceLastSample = 0;
     }
@@ -92,7 +78,7 @@ export function optimizeChartData(data: FormattedLatencyData[], maxPoints = 200)
   return result;
 }
 
-// --- generateOfflineSegments function (lines 148-169 from App.tsx) ---
+// --- generateOfflineSegments function ---
 /**
  * Identifies contiguous segments where latency is null (offline).
  * @param data - The formatted chart data array.
@@ -104,29 +90,80 @@ export const generateOfflineSegments = (data: FormattedLatencyData[]): { x1: num
 
   for (let i = 0; i < data.length; i++) {
     const point = data[i];
-    const isOffline = point.latency === null;
+    const isOffline = point.latency_ms === null; // Use latency_ms
 
     if (isOffline && segmentStart === null) {
       // Start of an offline segment
       segmentStart = point.time;
     } else if (!isOffline && segmentStart !== null) {
       // End of an offline segment
-      // Use the current point's time as the end boundary
-      segments.push({ x1: segmentStart, x2: point.time });
+      // Use the time of the *previous* point (the last offline one) as the end
+      const segmentEnd = data[i-1].time;
+      segments.push({ x1: segmentStart, x2: segmentEnd });
       segmentStart = null;
-    }
-
-    // Handle case where the data ends during an offline segment
-    if (isOffline && i === data.length - 1 && segmentStart !== null) {
-       // Use the last point's time as the end. If there's a next expected interval,
-       // you might want to calculate that, but using the last known point is safer.
-       segments.push({ x1: segmentStart, x2: point.time });
     }
   }
 
-  // Handle edge case: If the *entire* dataset is offline
-  if (segmentStart !== null && segments.length === 0 && data.length > 0) {
+  // If the data ends while offline, close the last segment
+  if (segmentStart !== null) {
+    segments.push({ x1: segmentStart, x2: data[data.length - 1].time });
+  }
+
+  // Handle case where the entire dataset might be offline
+  if (segments.length === 0 && data.length > 0 && data.every(p => p.latency_ms === null)) { // Use latency_ms
      segments.push({ x1: data[0].time, x2: data[data.length - 1].time });
+  }
+
+  return segments;
+};
+
+/**
+ * Identifies significant time gaps between consecutive data points.
+ * @param data - The formatted chart data array (should be sorted by time).
+ * @param xAxisDomain - The domain of the x-axis.
+ * @param thresholdMilliseconds - The minimum gap duration to report (e.g., 2 minutes).
+ * @returns An array of objects representing missing data segments { x1: start time, x2: end time }.
+ */
+export const generateMissingDataSegments = (
+  data: FormattedLatencyData[],
+  xAxisDomain: [number, number], // Add xAxisDomain as a parameter
+  thresholdMilliseconds: number = 2 * 60 * 1000 // Default to 2 minutes
+): { x1: number; x2: number }[] => {
+  const segments: { x1: number; x2: number }[] = [];
+  const [domainStart, domainEnd] = xAxisDomain;
+
+  if (!data || data.length === 0) {
+    // If no data, the entire domain is "missing"
+    // Only add if the domain itself is valid (start < end)
+    if (domainStart < domainEnd) {
+      segments.push({ x1: domainStart, x2: domainEnd });
+    }
+    return segments;
+  }
+
+  // Sort data just in case, though it should be sorted from formatChartData
+  const sortedData = [...data].sort((a, b) => a.time - b.time);
+
+  let lastKnownTime = domainStart;
+
+  // Check for gap at the beginning
+  if (sortedData[0].time - lastKnownTime > thresholdMilliseconds) {
+    segments.push({ x1: lastKnownTime, x2: sortedData[0].time });
+  }
+  lastKnownTime = sortedData[0].time; // Initialize with the first data point's time
+
+  // Check for internal gaps
+  for (let i = 0; i < sortedData.length; i++) {
+    const point = sortedData[i];
+    if (point.time - lastKnownTime > thresholdMilliseconds) {
+      segments.push({ x1: lastKnownTime, x2: point.time });
+    }
+    lastKnownTime = point.time;
+  }
+
+  // Check for gap at the end
+  if (domainEnd - lastKnownTime > thresholdMilliseconds) {
+    segments.push({ x1: lastKnownTime, x2: domainEnd });
   }
 
   return segments;
@@ -164,9 +201,9 @@ export function calculateDynamicTicks(data: { time: number }[], maxTicks: number
 
 // --- formatChartData function (lines 270-274 from App.tsx) ---
 export const formatChartData = (raw: RawLatencyData[]): FormattedLatencyData[] =>
-  raw.map(({ time, latency }) => ({
-    time: new Date(time + 'Z').getTime(), // Ensure UTC is parsed correctly
-    latency,
+  raw.map(({ time, latency_ms }) => ({ // Use latency_ms here
+    time: new Date(time).getTime(), // Assuming backend returns ISO string parsable by Date
+    latency_ms, // Keep the original property name
   }));
 
 // --- statusColor function (lines 38-39 from App.tsx) ---

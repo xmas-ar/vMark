@@ -1,3 +1,17 @@
+# vMark Release Notes - v0.1.3
+
+**New Features:**
+- Added a lockable sidebar menu with categorized tabs for improved navigation.
+- Nodes can now be filtered by Tags in addition to Node IDs.
+- Introduced Ad-hoc RFC 5357 (TWAMP) Benchmarks:
+    - Configurable test parameters
+    - Start/Stop control from the UI
+
+**Improvements:**
+
+- Optimized heartbeat graph rendering for better performance at scale.
+- Added useful external and internal links in the footer section.
+
 # vMark Release Notes - v0.1.2
 
 - Bug fixes to styling and async function for node info fetching.

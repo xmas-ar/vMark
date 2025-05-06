@@ -9,17 +9,24 @@ import asyncio
 import os
 import backend.config as config
 
+# ✅ Define app first
+app = FastAPI()
+
 # Define the path to the built frontend files WITHIN the container structure
 # It's now relative to main.py inside the backend directory
 STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), "frontend/dist")
 
-# ✅ Define app first
-app = FastAPI()
+# ✅ Mount static files after app is defined
+# Ensure the directory path is correct relative to where main.py is when the app runs
+# Inside the container, after COPY backend/ ./backend/, main.py is at /app/backend/main.py
+# And frontend assets are at /app/backend/frontend/dist
+app.mount("/", StaticFiles(directory=STATIC_FILES_DIR, html=True), name="static-root")
+
 
 # Use ALLOWED_ORIGINS from config.py
 allowed_origins = config.ALLOWED_ORIGINS
 
-# ✅ CORS config before routers
+# ✅ CORS config before routers, after app is defined
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins, # Use the imported config value
@@ -32,32 +39,27 @@ app.add_middleware(
 app.include_router(api_router, prefix="/api")
 app.include_router(latency_router, prefix="/api")
 
-# ✅ Mount static files directory (Serve assets like CSS, JS)
-# The path "/assets" should match the base path used in your index.html for assets
-# Check your frontend build output and how index.html references files.
-# If index.html uses relative paths like "./assets/...", mounting at "/" might be needed instead.
-# Let's assume assets are referenced like /assets/main.css
-if os.path.exists(os.path.join(STATIC_FILES_DIR, "assets")):
-    app.mount("/assets", StaticFiles(directory=os.path.join(STATIC_FILES_DIR, "assets")), name="assets")
+# The StaticFiles mount at "/" with html=True should handle serving index.html
+# for the root and client-side routes. The explicit @app.get("/") and @app.get("/{full_path:path}")
+# might become redundant or conflict if not carefully managed with the StaticFiles mount.
+# For a typical SPA, mounting StaticFiles at "/" with html=True is often sufficient.
 
-# ✅ Serve index.html for the root path and potentially other frontend routes
-# This catch-all route should be last
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    index_path = os.path.join(STATIC_FILES_DIR, "index.html")
-    if not os.path.exists(index_path):
-        return {"error": "Frontend not built or index.html not found"}, 404
-    # Return index.html for any path not caught by API routes or static files mount
-    # This allows client-side routing (React Router, Vue Router) to work
-    return FileResponse(index_path)
+# If you still need specific handling for index.html for client-side routing,
+# ensure it doesn't conflict with the primary StaticFiles mount.
+# Consider removing these if the main app.mount("/", ...) handles it.
+# @app.get("/{full_path:path}")
+# async def serve_frontend(full_path: str):
+#     index_path = os.path.join(STATIC_FILES_DIR, "index.html")
+#     if not os.path.exists(index_path):
+#         return {"error": "Frontend not built or index.html not found"}, 404
+#     return FileResponse(index_path)
 
-# Serve index.html for the root path explicitly as well
-@app.get("/")
-async def serve_root_frontend():
-    index_path = os.path.join(STATIC_FILES_DIR, "index.html")
-    if not os.path.exists(index_path):
-         return {"error": "Frontend not built or index.html not found"}, 404
-    return FileResponse(index_path)
+# @app.get("/")
+# async def serve_root_frontend():
+#     index_path = os.path.join(STATIC_FILES_DIR, "index.html")
+#     if not os.path.exists(index_path):
+#          return {"error": "Frontend not built or index.html not found"}, 404
+#     return FileResponse(index_path)
 
 
 # ✅ Startup hook AFTER app is defined
