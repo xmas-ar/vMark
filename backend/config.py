@@ -1,5 +1,5 @@
 import os
-VERSION = "v0.1.3"
+VERSION = "v0.1.4"
 VMARK_ID = "208f3njq24390uvn3w9pou0rfnv309uvnq0329u4fn029ubnf30129ubc"
 HOST_IP = os.environ.get("HOST", "0.0.0.0")
 
