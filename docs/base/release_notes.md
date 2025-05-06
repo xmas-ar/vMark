@@ -1,4 +1,4 @@
-# vMark Release Notes - v0.1.3/4
+# vMark Release Notes - v0.1.4
 
 **New Features:**
 - Added a lockable sidebar menu with categorized tabs for improved navigation.
