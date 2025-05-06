@@ -137,7 +137,7 @@ git clone https://github.com/xmas-ar/vMark
 ```
 cd backend
 python3 -m venv venv        # Create a virtual environment
-source venv/bin/activate   # Activate (use venv\Scripts\activate on Windows)
+source venv/bin/activate
 pip install -r requirements.txt # Install Python dependencies
 # Initialize database if needed (e.g., python init_db.py)
 cd ..                      # Go back to the root vMark directory
@@ -152,10 +152,15 @@ npm run build              # Build static frontend files (output to frontend/dis
 cd ..                      # Go back to the root vMark directory
 ```
 
-4.  **Run Backend & Frontend Server:**
+4.  **Modify line 17 in backend/main.py to:** (termporal fix, will be removed in further versions).
+```
+STATIC_FILES_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+```
+
+5.  **Run Backend & Frontend Server:**
 
 ```
-From the `vMark` root directory:
+From the `vMark` root directory and with Virtual environment activated:
 uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 
 and from frontend directory:
