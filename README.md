@@ -1,4 +1,7 @@
-<h1 align="center">vMark by Pathgate</h1>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/766164e9-3a5a-46a2-9183-dcfef9bc0aa9" alt="xxx" style="width: 500px; height: auto;">
+</p>
+
 <p align="center">Latest version: 0.1.4 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
 
 **🚀 Features:**
@@ -72,9 +75,12 @@
 
 <p align="center">The endpoints orchestrated by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> instances. </p>
 
+
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/d4669ced-d272-41cf-874e-844a26197462" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/0ea88ad2-df81-4858-8775-f0ba3d4040b4" alt="xxx">
 </p>
+
+
 
 <h1 align="center"># Architecture</h1>
 
