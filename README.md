@@ -73,11 +73,8 @@
 <p align="center">The endpoints orchestrated by this system are <a href="https://github.com/xmas-ar/vMark-node">vMark-node</a> instances. </p>
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/57e612f0-ee6f-4b90-a4d2-a2b99ccd2f96" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/d4669ced-d272-41cf-874e-844a26197462" alt="xxx">
 </p>
-
-https://github.com/user-attachments/assets/435cab04-a05d-4cd8-86f9-455ec2484d4c
-
 
 <h1 align="center"># Architecture</h1>
 
