@@ -114,12 +114,12 @@ This method requires Docker to be installed on your system.
 1.  **Pull the Docker Image:**
 
 ```
-docker pull xmasar/vmark:v0.1.4
+docker pull xmasar/vmark:v0.1.5
 ```
 
 2.  **Run the Docker Container:**
 ```
-docker run -d -p 8000:8000 --name vmark xmasar/vmark:v0.1.4
+docker run -d -p 8000:8000 --name vmark xmasar/vmark:v0.1.5
 ```
 
 3.  **Access vMark:** Open your web browser and navigate to `http://localhost:8000`.
