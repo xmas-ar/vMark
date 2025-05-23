@@ -1,0 +1,6 @@
+# backend/requirements-docs.txt
+# Igual que backend/requirements.txt pero sin ethtool
+fastapi==...
+sqlalchemy==...
+# (el resto de tus paquetes)
+# Exclude ethtool
