@@ -5,11 +5,14 @@ from datetime import datetime
 from typing import List, Optional, Dict, Any
 from ..config import VERSION, VMARK_ID
 from ..models.Node import Node
+from ..models.eline_service import ELineService, ELineServiceCreate, ELineServiceRead, ELineServiceUpdate, ForwardingRuleDetails
 from ..db import get_db
 from sqlmodel import Session, select
 import httpx
 import json
 import asyncio
+from sqlalchemy.exc import IntegrityError # Import IntegrityError
+from sqlalchemy.orm import selectinload
 
 # --- Add Logging Setup ---
 log = logging.getLogger(__name__)
@@ -204,74 +207,58 @@ class ExecuteCommandPayload(BaseModel):
     vmark_id: Optional[str] = None
 
 @router.post("/nodes/{node_id}/execute")
-async def execute_node_command(
-    node_id: str,
-    payload: ExecuteCommandPayload,
-    db: Session = Depends(get_db)
-):
-    """
-    Relay a command execution request to a specific vMark-node.
-    """
-    # 1. Find the node in the database
-    node = db.exec(select(Node).where(Node.id == node_id)).first()
+async def execute_node_command(node_id: str, payload: ExecuteCommandPayload, db: Session = Depends(get_db)):
+    # Busca el nodo en la base de datos
+    node = db.query(Node).filter(Node.id == node_id).first()
     if not node:
-        raise HTTPException(status_code=404, detail=f"Node '{node_id}' not found")
-    if not node.port:
-         raise HTTPException(status_code=400, detail=f"Node '{node_id}' does not have a configured port.")
-
-    # 2. Construct the target URL for the node's API
+        raise HTTPException(status_code=404, detail="Node not found")
     node_ip = node.ip
     node_port = node.port
-    if ":" in node_ip: # IPv6
+
+    # Construye la URL de destino
+    if ":" in node_ip:  # IPv6
         target_url = f"http://[{node_ip}]:{node_port}/api/execute"
-    else: # IPv4
+    else:
         target_url = f"http://{node_ip}:{node_port}/api/execute"
 
-    # 3. Prepare the payload for the node
-    #    IMPORTANT: Use the backend's VMARK_ID to authenticate with the node
     node_payload = {
         "command": payload.command,
         "vmark_id": VMARK_ID
     }
 
-    # 4. Forward the request to the node
     try:
         async with httpx.AsyncClient() as client:
-            print(f"Relaying command to {target_url}: {payload.command}") # Debug print
             response = await client.post(
                 target_url,
                 json=node_payload,
-                timeout=30.0 # Allow a longer timeout for potentially long commands
+                timeout=10.0
             )
-
-            # Check if the node responded successfully (even if command execution failed)
-            response.raise_for_status() # Raise HTTPError for 4xx/5xx responses
-
-            # 5. Return the node's response (which should contain the command output)
-            node_response_data = response.json()
-            print(f"Node response: {node_response_data}") # Debug print
-            return node_response_data # Forward the whole JSON response
-
+            response.raise_for_status()
+            try:
+                result_data = response.json()
+            except Exception as e:
+                raise HTTPException(status_code=502, detail=f"Invalid JSON from node: {e}")
     except httpx.RequestError as e:
-        error_detail = f"Could not connect to node '{node_id}' at {target_url}: {str(e)}"
-        print(f"Error: {error_detail}") # Debug print
-        raise HTTPException(status_code=502, detail=error_detail) # Bad Gateway
+        raise HTTPException(status_code=502, detail=f"Could not connect to node: {e}")
     except httpx.HTTPStatusError as e:
-        # Handle non-2xx responses from the node API
-        error_detail = f"Node '{node_id}' API error: {e.response.status_code} - {e.response.text}"
-        print(f"Error: {error_detail}") # Debug print
-        # Try to return the node's error output if possible, otherwise raise generic error
+        raise HTTPException(status_code=e.response.status_code, detail=f"Node error: {e.response.text}")
+
+    if not isinstance(result_data, dict) or "output" not in result_data:
+        raise HTTPException(status_code=502, detail="Node did not return expected output")
+
+    handler_output = result_data["output"]
+
+    # Si el output ya es un string JSON, no lo envuelvas en {"table": ...}
+    if isinstance(handler_output, str):
         try:
-            node_error_data = e.response.json()
-            # Return the node's error structure, but use the node's status code
-            raise HTTPException(status_code=e.response.status_code, detail=node_error_data)
+            # Verifica si el string es un JSON válido
+            json.loads(handler_output)
+            return {"output": {"table": handler_output}}
         except json.JSONDecodeError:
-             # If the node's error response wasn't JSON
-             raise HTTPException(status_code=e.response.status_code, detail=error_detail)
-    except Exception as e:
-        error_detail = f"An unexpected error occurred while communicating with node '{node_id}': {str(e)}"
-        print(f"Error: {error_detail}") # Debug print
-        raise HTTPException(status_code=500, detail=error_detail)
+            # Si no es un JSON válido, devuelve como está
+            return {"output": handler_output}
+    else:
+        return {"output": handler_output}
 
 # --- NEW ROUTE for TWAMP Status/Results ---
 @router.get("/nodes/{node_id}/twamp/status", tags=["TWAMP"])
@@ -380,3 +367,246 @@ async def get_twamp_sender_status(
         raise HTTPException(status_code=500, detail=f"Internal server error processing status request: {e}")
 
 # --- End New Route ---
+
+@router.get("/eline-services", response_model=List[ELineServiceRead])
+async def list_eline_services(db: Session = Depends(get_db)):
+    services_from_db = db.exec(
+        select(ELineService)
+        .options(selectinload(ELineService.a_node), selectinload(ELineService.z_node))
+    ).all()
+    
+    response_list = []
+    for db_service in services_from_db:
+        # Fetch rule details concurrently for efficiency
+        a_rule_task = _get_rule_details_from_node(db_service.a_node_id, db_service.a_rule_name, db)
+        z_rule_task = _get_rule_details_from_node(db_service.z_node_id, db_service.z_rule_name, db)
+        a_rule_data, z_rule_data = await asyncio.gather(a_rule_task, z_rule_task)
+
+        service_active = bool(a_rule_data and a_rule_data.active and z_rule_data and z_rule_data.active)
+        
+        a_node_ip = db_service.a_node.ip if db_service.a_node else None
+        z_node_ip = db_service.z_node.ip if db_service.z_node else None
+
+        response_list.append(ELineServiceRead(
+            name=db_service.name,
+            description=db_service.description,
+            a_node_id=db_service.a_node_id,
+            a_iface=db_service.a_iface,
+            a_rule_name=db_service.a_rule_name,
+            z_node_id=db_service.z_node_id,
+            z_iface=db_service.z_iface,
+            z_rule_name=db_service.z_rule_name,
+            created_at=db_service.created_at,
+            updated_at=db_service.updated_at,
+            a_node_ip=a_node_ip,
+            z_node_ip=z_node_ip,
+            active=service_active,
+            a_rule_data=a_rule_data, 
+            z_rule_data=z_rule_data 
+        ))
+    return response_list
+
+@router.post("/eline-services", response_model=ELineServiceRead)
+def create_eline_service(service_payload: ELineServiceCreate, db: Session = Depends(get_db)):
+    # Valida si es un One-node E-Line
+    is_one_node_eline = not service_payload.z_node_id
+
+    # Crea el servicio en la base de datos
+    db_service = ELineService(
+        name=service_payload.name,
+        description=service_payload.description,
+        a_node_id=service_payload.a_node_id,
+        a_iface=service_payload.a_iface,
+        a_rule_name=service_payload.a_rule_name,
+        z_node_id=service_payload.z_node_id if not is_one_node_eline else None,
+        z_iface=service_payload.z_iface if not is_one_node_eline else None,
+        z_rule_name=service_payload.z_rule_name if not is_one_node_eline else None,
+    )
+
+    db.add(db_service)
+
+    try:
+        db.commit()
+        db.refresh(db_service)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error creating E-Line service: {str(e)}")
+
+    return db_service
+
+@router.get("/eline-services/{name}", response_model=ELineServiceRead)
+def get_eline_service(name: str, db: Session = Depends(get_db)):
+    service = db.get(ELineService, name)
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return service
+
+@router.put("/eline-services/{name}", response_model=ELineServiceRead)
+def update_eline_service(name: str, update: ELineServiceUpdate, db: Session = Depends(get_db)):
+    service = db.get(ELineService, name)
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    update_data = update.dict(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(service, key, value)
+    db.add(service)
+    db.commit()
+    db.refresh(service)
+    return service
+
+@router.delete("/eline-services/{name}")
+def delete_eline_service(name: str, db: Session = Depends(get_db)):
+    service = db.get(ELineService, name)
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    db.delete(service)
+    db.commit()
+    return {"ok": True}
+
+# Helper to execute command on a node (refactored and simplified)
+async def _execute_node_command_internal(node_id: str, command_to_execute: str, db: Session) -> Optional[Dict[str, Any]]:
+    node = db.get(Node, node_id)
+    if not node:
+        log.warning(f"Node {node_id} not found for command execution.")
+        return None
+
+    target_url = f"http://{node.ip}:{node.port}/execute"
+    headers = {}  # No auth_token in Node model
+    payload = {"command": command_to_execute}
+
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        try:
+            response = await client.post(target_url, json=payload, headers=headers)
+            response.raise_for_status()
+            return response.json()
+        except httpx.RequestError as e:
+            log.error(f"Connection error to node '{node_id}' for command '{command_to_execute}': {e}")
+        except httpx.HTTPStatusError as e:
+            log.error(f"Node '{node_id}' API error for command '{command_to_execute}': {e.response.status_code} - {e.response.text}")
+        except json.JSONDecodeError as e:
+            log.error(f"Invalid JSON response from node '{node_id}' for command '{command_to_execute}': {e}")
+        except Exception as e:
+            log.error(f"Unexpected error executing command '{command_to_execute}' on node '{node_id}': {e}", exc_info=True)
+    return None
+
+# Helper to get specific rule details from a node
+async def _get_rule_details_from_node(node_id: str, rule_name: str, db: Session) -> Optional[ForwardingRuleDetails]:
+    node_response = await _execute_node_command_internal(node_id, "xdp-switch show-forwarding json", db)
+
+    if not node_response or not isinstance(node_response.get("output"), dict):
+        log.warning(f"No valid output from node {node_id} when fetching rules.")
+        return None
+    
+    table_str = node_response["output"].get("table")
+    if not isinstance(table_str, str):
+        log.warning(f"Forwarding table from node {node_id} is not a string: {table_str}")
+        return None
+
+    try:
+        rules_list = json.loads(table_str)
+        if not isinstance(rules_list, list):
+            log.warning(f"Parsed forwarding table from node {node_id} is not a list.")
+            return None
+        
+        for rule_dict in rules_list:
+            if isinstance(rule_dict, dict) and rule_dict.get("name") == rule_name:
+                log.info(f"Rule found: {rule_dict}")  # <--- Agrega esto
+                try:
+                    return ForwardingRuleDetails.model_validate(rule_dict)
+                except Exception as e:
+                    log.error(f"Validation error for rule '{rule_name}' from node {node_id}. Data: {rule_dict}. Error: {e}", exc_info=True)
+                    return None
+        log.warning(f"Rule '{rule_name}' not found in forwarding table of node {node_id}.")
+    except json.JSONDecodeError:
+        log.error(f"Failed to parse forwarding table JSON string from node {node_id}.", exc_info=True)
+    return None
+
+# Modified GET /eline-services (list)
+@router.get("/eline-services", response_model=List[ELineServiceRead])
+async def list_eline_services_with_status(db: Session = Depends(get_db)): # Made async
+    services_from_db = db.exec(select(ELineService).options(selectinload(ELineService.a_node), selectinload(ELineService.z_node))).all() # Eager load nodes
+    
+    response_list = []
+    for db_service in services_from_db:
+        # Fetch rule details concurrently for efficiency
+        a_rule_task = _get_rule_details_from_node(db_service.a_node_id, db_service.a_rule_name, db)
+        z_rule_task = _get_rule_details_from_node(db_service.z_node_id, db_service.z_rule_name, db)
+        a_rule_data, z_rule_data = await asyncio.gather(a_rule_task, z_rule_task)
+
+        service_active = bool(a_rule_data and a_rule_data.active and z_rule_data and z_rule_data.active)
+        
+        a_node_ip = db_service.a_node.ip if db_service.a_node else None
+        z_node_ip = db_service.z_node.ip if db_service.z_node else None
+
+        response_list.append(ELineServiceRead(
+            name=db_service.name,
+            description=db_service.description,
+            a_node_id=db_service.a_node_id,
+            a_iface=db_service.a_iface,
+            a_rule_name=db_service.a_rule_name,
+            z_node_id=db_service.z_node_id,
+            z_iface=db_service.z_iface,
+            z_rule_name=db_service.z_rule_name,
+            created_at=db_service.created_at,
+            updated_at=db_service.updated_at,
+            a_node_ip=a_node_ip,
+            z_node_ip=z_node_ip,
+            active=service_active,
+            a_rule_data=a_rule_data, 
+            z_rule_data=z_rule_data 
+        ))
+    return response_list
+
+# Modified GET /eline-services/{name} (detail)
+@router.get("/eline-services/{name}", response_model=ELineServiceRead)
+async def get_eline_service_details(name: str, db: Session = Depends(get_db)): # Made async
+    db_service = db.get(ELineService, name) # SQLModel get does not support options directly
+    if not db_service:
+        raise HTTPException(status_code=404, detail="E-Line Service not found")
+    
+    # Manually trigger loading of relationships if not already loaded by a_node/z_node access
+    # or ensure they are loaded via a separate query or configuration.
+    # For simplicity, assuming direct access works due to lazy="joined" or prior access.
+    # If a_node/z_node are None here, it means the FKs are bad or relationships aren't loading.
+    # Add selectinload to the initial query if needed:
+    db_service_full = db.exec(
+        select(ELineService).where(ELineService.name == name).options(
+            selectinload(ELineService.a_node), 
+            selectinload(ELineService.z_node)
+        )
+    ).first()
+
+    if not db_service_full: # Should not happen if db.get found it, but good practice
+        raise HTTPException(status_code=404, detail="E-Line Service not found (consistency issue)")
+
+    a_rule_task = _get_rule_details_from_node(db_service_full.a_node_id, db_service_full.a_rule_name, db)
+    z_rule_task = _get_rule_details_from_node(db_service_full.z_node_id, db_service_full.z_rule_name, db)
+    a_rule_data, z_rule_data = await asyncio.gather(a_rule_task, z_rule_task)
+
+    service_active = bool(a_rule_data and a_rule_data.active and z_rule_data and z_rule_data.active)
+    
+    a_node_ip = db_service_full.a_node.ip if db_service_full.a_node else None
+    z_node_ip = db_service_full.z_node.ip if db_service_full.z_node else None
+
+    return ELineServiceRead(
+        name=db_service_full.name,
+        description=db_service_full.description,
+        a_node_id=db_service_full.a_node_id,
+        a_iface=db_service_full.a_iface,
+        a_rule_name=db_service_full.a_rule_name,
+        z_node_id=db_service_full.z_node_id,
+        z_iface=db_service_full.z_iface,
+        z_rule_name=db_service_full.z_rule_name,
+        created_at=db_service_full.created_at,
+        updated_at=db_service_full.updated_at,
+        a_node_ip=a_node_ip,
+        z_node_ip=z_node_ip,
+        active=service_active,
+        a_rule_data=a_rule_data,
+        z_rule_data=z_rule_data
+    )
+
+# Ensure you have `from sqlalchemy.orm import selectinload` for eager loading
+# and `import asyncio`
+
+# ... (rest of your routes, including POST, PUT, DELETE for eline-services)

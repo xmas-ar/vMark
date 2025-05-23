@@ -79,17 +79,15 @@ async def heartbeat_loop():
                     # Always create a history entry, use None for latency if offline
                     avg_latency = None
                     if is_online:
-                        add_latency(node.id, latency_ms)  # Add the new latency value to the queue
-                        avg_latency = calculate_average_latency(node.id) # Calculate average only if online
+                        add_latency(node.id, latency_ms)
+                        avg_latency = calculate_average_latency(node.id)
                         node.status = "online"
-                        node.last_seen = now
+                        node.last_seen = now  # <--- Solo aquí
                     else:
-                        # Clear latency deque for offline node if needed, or let it expire
                         if node.id in node_latency_data:
-                            node_latency_data[node.id].clear() 
+                            node_latency_data[node.id].clear()
                         node.status = "offline"
-                        # Do not update last_seen if offline? Or update it? Let's update it.
-                        node.last_seen = now # Keep updating last_seen to know when the check happened
+                        # NO actualizar node.last_seen aquí
                     
                     # Save the latency history entry (average if online, None if offline)
                     entry = LatencyHistory(

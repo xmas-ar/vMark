@@ -60,3 +60,59 @@ export interface Node {
   // --- End Modification ---
   // Add any other properties your Node object has
 }
+
+export interface ForwardingRule {
+  name: string;
+  in_interface: string;
+  match_svlan: number | null; // Corregido: nombre y tipo
+  match_cvlan: number | null; // Corregido: nombre y tipo
+  out_interface: string | null; // Corregido: tipo para coincidir con Optional[str]
+  pop_tags: number | null;    // Corregido: tipo
+  push_svlan: number | null; // Corregido: tipo
+  push_cvlan: number | null; // Corregido: tipo
+  active: boolean | null;     // Corregido: tipo
+}
+
+export interface ELineService {
+  name: string;
+  description?: string | null;
+
+  a_node_id: string;
+  a_iface: string;
+  a_rule_name: string;
+  a_node_ip?: string;
+  a_rule_data?: ForwardingRule | null; // Usará la ForwardingRule corregida
+
+  z_node_id: string;
+  z_iface: string;
+  z_rule_name: string;
+  z_node_ip?: string;
+  z_rule_data?: ForwardingRule | null; // Usará la ForwardingRule corregida
+
+  active: boolean; // El estado general del servicio ya es booleano
+  created_at: string;
+  updated_at: string;
+}
+
+// Payload for creating a new E-Line Service
+export interface ELineServiceCreatePayload {
+  name: string;
+  description?: string | null;
+  a_node_id: string;
+  a_iface: string;
+  a_rule_name: string;
+  z_node_id: string;
+  z_iface: string;
+  z_rule_name: string;
+}
+
+// Payload for updating an E-Line Service (all fields optional)
+export interface ELineServiceUpdatePayload {
+  description?: string | null;
+  a_node_id?: string;
+  a_iface?: string;
+  a_rule_name?: string;
+  z_node_id?: string;
+  z_iface?: string;
+  z_rule_name?: string;
+}

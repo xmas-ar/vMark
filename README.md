@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/766164e9-3a5a-46a2-9183-dcfef9bc0aa9" alt="xxx" style="width: 500px; height: auto;">
 </p>
 
-<p align="center">Latest version: 0.1.4 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
+<p align="center">Latest version: 0.1.5 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
 
 **🚀 Features:**
 - Ad-hoc RFC 5357 (TWAMP) Benchmarks
@@ -10,6 +10,7 @@
 - Heartbeat sensor (last 24hs)
 - Node Filtering & Tags-based Search.
 - Docker deployment.
+- Remote vMark MEF E-line services deployment (eBPF/XDP). (v0.1.5)
 
 
 <details>
@@ -32,7 +33,6 @@
   
   3. Automation
   
-  - Remote vMark MEF Ethernet services deployment & monitoring.
   - Scheduled Tests (hourly, daily, during maintenance windows)
   - Threshold-Based Alerts (ex: latency > 5 ms triggers an alert)
   - Trend Analysis and Forecasting (AI/ML for predicting future problems, suggest fixes)

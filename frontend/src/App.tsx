@@ -7,8 +7,9 @@ import TwampRunner from './components/TwampRunner';
 import { NodeInfo, CachedLatencyData, ModalType, NodeForm, RawLatencyData, FormattedLatencyData } from './types';
 // Import optimizeChartData
 import { formatChartData, statusColor, optimizeChartData } from './utils/chartUtils';
+import EthernetDeploySuite from './components/EthernetDeploySuite';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://192.168.178.119:8000/api';
 
 // Define Section types
 type SectionName =
@@ -34,7 +35,7 @@ const sections: Section[] = [
   { id: 'Nodes', name: 'Nodes', icon: '/icons/1 dashboard.png', tabs: ['Summary', 'Check node'] }, // Example tab
   { id: 'benchmarks', name: 'Benchmarks', icon: '/icons/2 benchmarks.png', tabs: ['Twamp (RFC5357)','Service Activation Suite', 'PDV Bench', 'Path MTU'] },
   { id: 'performance', name: 'Performance', icon: '/icons/3 performance.png', tabs: ['Precision Time Mesh (IEEE 1588v2)', 'Ethernet OAM (CFM/LFM)', 'PSA - Pathgate Service Assurance (RFC 5880)'] },
-  { id: 'automation', name: 'Automation', icon: '/icons/4 automation.png', tabs: ['Ethernet Services Deployment', 'Scheduled Tests', 'Alerts & Thresholds'] },
+  { id: 'automation', name: 'Automation', icon: '/icons/4 automation.png', tabs: ['Ethernet Deploy Suite', 'Scheduled Tests', 'Alerts & Thresholds'] },
   { id: 'observability', name: 'Observability', icon: '/icons/5 observability.png', tabs: ['Flow Export', 'Packet Capture', 'Live Stats', 'Interface Health'] },
   { id: 'userManagement', name: 'User Management', icon: '/icons/6 User Management.png', tabs: ['Tenants', 'Auth'] },
   { id: 'reports', name: 'Reports', icon: '/icons/7 reports.png', tabs: ['Generate', 'History'] },
@@ -110,7 +111,7 @@ export default function App() {
   const [nodeForm, setNodeForm] = useState<NodeForm>({
     node_id: '', ip: '', tags: '', auth_token: '', port: '1050' // Rename capabilities to tags
   });
-  const [version, setVersion] = useState<string>("v0.1.4");
+  const [version, setVersion] = useState<string>("v0.1.5t");
   const [isSidebarLocked, setIsSidebarLocked] = useState(false); // <-- Add this state
   // Ref to track nodes currently being preloaded to avoid redundant fetches
   const preloadingNodes = useRef<Set<string>>(new Set());
@@ -485,21 +486,28 @@ export default function App() {
 
   // --- Rendering ---
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans flex">
+    <div className="min-h-screen bg-black text-gray-100 font-sans flex items-start"> {/* Added items-start */}
       {/* Sidebar */}
-       <aside className={`group transition-all duration-200 ease-in-out bg-gray-800 p-4 border-r border-gray-700 flex flex-col overflow-hidden ${isSidebarLocked ? 'w-64' : 'w-20 hover:w-64'}`}>
+       <aside className={`group transition-all duration-200 ease-in-out bg-[#202020] p-4 border-r border-gray-500 flex flex-col overflow-hidden ${isSidebarLocked ? 'w-64' : 'w-20 hover:w-64'} h-screen`}> {/* Added h-screen */}
         {/* Adjust vMark visibility */}
-        <div className="mb-8 flex items-center gap-2">
-           {/* Apply the same visibility logic as section names */}
-           <span className={`text-xl font-bold text-gray-100 transition-opacity duration-150 delay-100 whitespace-nowrap ${isSidebarLocked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>vMark</span>
+        <div className="mb-4 flex items-center gap-2 px-1"> {/* Added px-1 for slight padding, adjusted gap */}
+           <img
+             src="/logos/vmark_orange_logo_onlyv2.png" // Assuming you reverted to v2 or it was a typo
+             alt="vMark Logo"
+             title="vMark Logo"
+             className="h-10 w-auto flex-shrink-0 opacity-100" // Adjusted height, ensure flex-shrink-0
+           />
+           <span className={`text-xl font-bold text-gray-100 transition-opacity duration-150 delay-100 whitespace-nowrap ${isSidebarLocked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+             vMark
+           </span>
         </div>
         <nav className="space-y-3 flex-1">
           {sections.map((section) => (
             <button
               key={section.id}
               title={section.name} // Tooltip for icon-only state
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                activeSectionId === section.id ? 'bg-blue-600 text-white' : 'hover:bg-gray-700 text-gray-300'
+              className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                activeSectionId === section.id ? 'bg-[#ea6508] text-white' : 'hover:bg-[#202020] text-gray-300'
               }`}
               onClick={() => setActiveSectionId(section.id)}
             >
@@ -510,14 +518,14 @@ export default function App() {
         </nav>
 
         {/* --- Footer --- */}
-        <footer className={`mt-auto pt-4 border-t border-gray-700 transition-opacity duration-150 delay-100 ${isSidebarLocked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+        <footer className={`mt-auto pt-4 border-t border-gray-500 transition-opacity duration-150 delay-100 ${isSidebarLocked ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
           <div className="flex justify-between items-center mb-2">
             <a
               href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md"
               target="_blank"
               rel="noopener noreferrer"
               title="View Release Notes"
-              className="text-xs text-gray-400 hover:text-blue-400 hover:underline" // Add hover effect
+              className="text-xs text-gray-400 hover:text-bg-[#c6441a] hover:underline" // Add hover effect
             >
               {version} {/* Display 'v' prefix */}
             </a>
@@ -525,8 +533,8 @@ export default function App() {
             <button
               onClick={() => setIsSidebarLocked(!isSidebarLocked)}
               title={isSidebarLocked ? "Unlock Sidebar" : "Lock Sidebar Open"}
-              // Add styling for blue square button
-              className="flex items-center justify-center w-7 h-7 bg-blue-600 hover:bg-blue-500 text-white rounded transition-colors"
+              // Add styling for orange square button
+              className="flex items-center justify-center w-7 h-7 bg-[#c6441a] hover:bg-[#c6441a] text-white rounded transition-colors"
             >
               {/* Adjust icon size if needed */}
               {isSidebarLocked ? (
@@ -556,7 +564,7 @@ export default function App() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-6 md:p-10 overflow-y-auto">
+      <main className="flex-1 p-6 md:p-10 overflow-y-auto h-screen"> {/* Optional: also set h-screen here if main should also be viewport height and scroll internally */}
         {/* Find the current section object */}
         {(() => {
           const currentSection = sections.find(s => s.id === activeSectionId);
@@ -569,7 +577,7 @@ export default function App() {
 
               {/* Top Tabs (if section has tabs) */}
               {currentSection.tabs && currentSection.tabs.length > 0 && (
-                <div className="mb-6 border-b border-gray-700">
+                <div className="mb-6 border-b border-gray-500">
                   <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     {currentSection.tabs.map((tabName) => (
                       <button
@@ -577,7 +585,7 @@ export default function App() {
                         onClick={() => setActiveSubTab(tabName)}
                         className={`${
                           activeSubTab === tabName
-                            ? 'border-blue-500 text-blue-400'
+                            ? 'border-[#ea6508] text-white' // Changed text color to white for active tab
                             : 'border-transparent text-gray-400 hover:text-gray-200 hover:border-gray-500'
                         } whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
                       >
@@ -602,14 +610,14 @@ export default function App() {
                            id="filter"
                            value={filter}
                            onChange={(e) => setFilter(e.target.value)}
-                           className="bg-gray-700 border border-gray-600 rounded px-3 py-1 text-sm text-white"
+                           className="bg-[#202020] border border-gray-500 rounded px-3 py-1 text-sm text-white"
                          >
                            <option value="all">All</option>
                            <option value="online">Online</option>
                            <option value="offline">Offline</option>
                          </select>
                          <button
-                           className="text-sm bg-gray-700 hover:bg-gray-600 px-3 py-1 rounded border border-gray-600"
+                           className="text-sm bg-[#202020] hover:bg-[#202020] px-3 py-1 rounded border border-gray-500"
                            onClick={() => setTimezone((prev) => (prev === 'local' ? 'utc' : 'local'))}
                          >
                            TZ: {timezone.toUpperCase()}
@@ -619,13 +627,13 @@ export default function App() {
                          <input
                            type="text"
                            placeholder="Search nodes by ID or tags..."
-                           className="bg-gray-700 border border-gray-600 rounded px-3 py-1 text-sm w-full md:w-64 text-white"
+                           className="bg-[#202020] border border-gray-500 rounded px-3 py-1 text-sm w-full md:w-64 text-white"
                            value={search}
                            onChange={(e) => setSearch(e.target.value)}
                          />
                          <button
                            onClick={() => { setModalType('add'); setModalMode('add'); }} // Ensure mode is set
-                           className="bg-blue-500 hover:bg-blue-400 text-white py-1 px-3 rounded text-sm whitespace-nowrap" // Prevent wrap
+                           className="bg-[#c6441a] hover:bg-[#c6441a] text-white py-1 px-3 rounded text-sm whitespace-nowrap" // Prevent wrap
                          >
                            Node Add/Del
                          </button>
@@ -640,8 +648,8 @@ export default function App() {
                          <div
                            key={node.id}
                            // Apply ring directly here when selected
-                           className={`relative p-5 bg-gray-800 rounded-lg shadow-md border group transition-all duration-150 ease-in-out hover:border-blue-400 ${
-                             selectedNode?.id === node.id ? 'border-blue-500 ring-2 ring-blue-500' : 'border-gray-700'
+                           className={`relative p-5 bg-[#202020] rounded-lg shadow-md border group transition-all duration-150 ease-in-out hover:border-bg-[#c6441a] ${
+                             selectedNode?.id === node.id ? 'border-[#c6441a] ring-2 ring-[#c6441a]' : 'border-gray-500'
                            }`}
                            onClick={(e) => {
                                if (!(e.target instanceof Element && e.target.closest('.manage-button'))) {
@@ -671,7 +679,7 @@ export default function App() {
                            {/* Manage Button */}
                            {/* ... button JSX ... */}
                             <button
-                             className="manage-button absolute bottom-2 right-2 px-2 py-0.5 text-xs bg-gray-600 hover:bg-gray-500 text-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-in-out"
+                             className="manage-button absolute bottom-2 right-2 px-2 py-0.5 text-xs bg-gray-600 hover:bg-gray-600 text-gray-200 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-150 ease-in-out"
                              onClick={(e) => handleManageClick(e, node)}
                            >
                              Manage
@@ -683,22 +691,22 @@ export default function App() {
                     {/* Chart Area */}
                     {/* ... existing selectedNode && (...) JSX for chart ... */}
                      {selectedNode && (
-                       <div className="mt-8 p-6 bg-gray-800 rounded-lg shadow-md border border-gray-700">
+                       <div className="mt-8 p-6 bg-[#202020] rounded-lg shadow-md border border-gray-500">
                          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
                            <h3 className="text-xl font-bold whitespace-nowrap">
                              Heartbeat: {selectedNode.id}
                            </h3>
                            {/* Time Range and Refresh Buttons */}
                            <div className="flex items-center gap-2 flex-wrap">
-                             <div className="flex rounded-md border border-gray-600 bg-gray-700 overflow-hidden">
+                             <div className="flex rounded-md border border-gray-500 bg-[#202020] overflow-hidden">
                                {[2, 6, 12, 24].map((hours) => (
                                  <button
                                    key={hours}
                                    onClick={() => handleTimeRangeChange(hours as 2 | 6 | 12 | 24)}
-                                   className={`px-3 py-1 text-xs sm:text-sm border-l border-gray-600 first:border-l-0 transition-colors ${
+                                   className={`px-3 py-1 text-xs sm:text-sm border-l border-gray-500 first:border-l-0 transition-colors ${
                                      timeRange === hours
-                                       ? 'bg-blue-500 text-white'
-                                       : 'hover:bg-gray-600 text-gray-300'
+                                       ? 'bg-[#c6441a] text-white'
+                                       : 'hover:bg-[#202020] text-gray-300'
                                    }`}
                                  >
                                    {hours}h
@@ -708,7 +716,7 @@ export default function App() {
                              <button
                                onClick={handleRefreshChart} // Use dedicated handler
                                disabled={isLoadingChart}
-                               className="bg-blue-500 hover:bg-blue-400 text-white py-1 px-3 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                               className="bg-[#c6441a] hover:bg-[#c6441a] text-white py-1 px-3 rounded text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                              >
                                {isLoadingChart ? '...' : 'Refresh'}
                              </button>
@@ -719,7 +727,7 @@ export default function App() {
                             <ErrorBoundary fallback={<div className="text-red-400 p-4 border border-red-400 rounded">Error rendering chart.</div>}>
                               {isLoadingChart ? ( // Simplified loading check
                                 <div className="flex items-center justify-center h-full">
-                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+                                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#c6441a]" />
                                 </div>
                               ) : chartData.length === 0 ? ( // Check for empty data *after* loading is false
                                  <div className="flex items-center justify-center h-full">
@@ -770,9 +778,11 @@ export default function App() {
                  {/* --- Automation Content --- */}
                  {activeSectionId === 'automation' && (
                     <div>
-                      {activeSubTab === 'Deployment' && <div className="text-gray-400">Remote Deployment Content...</div>}
+                      {activeSubTab === 'Ethernet Deploy Suite' && (
+                        <EthernetDeploySuite nodes={nodes} apiBaseUrl={API_BASE_URL} />
+                      )}
                       {activeSubTab === 'Scheduled Tests' && <div className="text-gray-400">Scheduled Tests Content...</div>}
-                      {activeSubTab === 'Alerts' && <div className="text-gray-400">Threshold-Based Alerts Content...</div>}
+                      {activeSubTab === 'Alerts & Thresholds' && <div className="text-gray-400">Threshold-Based Alerts Content...</div>}
                     </div>
                  )}
 
@@ -835,9 +845,9 @@ export default function App() {
       >
         {/* Add/Delete/Edit Toggle - Conditionally render */}
         {modalMode !== 'edit' && ( // Only show if NOT in edit mode
-          <div className="flex rounded-lg border border-gray-600 bg-gray-700 mb-4 overflow-hidden">
-            <button onClick={() => setModalMode('add')} className={`flex-1 px-4 py-2 text-sm transition-colors ${ modalMode === 'add' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-600' }`}>Add</button>
-            <button onClick={() => setModalMode('delete')} className={`flex-1 px-4 py-2 text-sm transition-colors border-l border-gray-600 ${ modalMode === 'delete' ? 'bg-blue-500 text-white' : 'text-gray-300 hover:bg-gray-600' }`}>Delete</button>
+          <div className="flex rounded-lg border border-gray-500 bg-[#202020] mb-4 overflow-hidden">
+            <button onClick={() => setModalMode('add')} className={`flex-1 px-4 py-2 text-sm transition-colors ${ modalMode === 'add' ? 'bg-[#c6441a] text-white' : 'text-gray-300 hover:bg-[#202020]' }`}>Add</button>
+            <button onClick={() => setModalMode('delete')} className={`flex-1 px-4 py-2 text-sm transition-colors border-l border-gray-500 ${ modalMode === 'delete' ? 'bg-[#c6441a] text-white' : 'text-gray-300 hover:bg-[#202020]' }`}>Delete</button>
           </div>
         )}
 
@@ -853,14 +863,14 @@ export default function App() {
                     onChange={(e) => setNodeForm(prev => ({ ...prev, node_id: e.target.value }))}
                     // Make read-only when editing
                     readOnly={modalMode === 'edit'}
-                    className={`mt-1 block w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white ${modalMode === 'edit' ? 'cursor-not-allowed bg-gray-600' : ''}`}
+                    className={`mt-1 block w-full bg-[#202020] border border-gray-500 rounded px-3 py-2 text-sm text-white ${modalMode === 'edit' ? 'cursor-not-allowed bg-[#202020]' : ''}`}
                     required
                 />
              </div>
-             <div><label className="block text-sm font-medium text-gray-300 mb-1">IP Address</label><input type="text" value={nodeForm.ip} onChange={(e) => setNodeForm(prev => ({ ...prev, ip: e.target.value }))} className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white" required /></div>
-             <div><label className="block text-sm font-medium text-gray-300 mb-1">Port</label><input type="number" value={nodeForm.port} onChange={(e) => setNodeForm(prev => ({ ...prev, port: e.target.value }))} className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white" required min="1" max="65535"/></div>
+             <div><label className="block text-sm font-medium text-gray-300 mb-1">IP Address</label><input type="text" value={nodeForm.ip} onChange={(e) => setNodeForm(prev => ({ ...prev, ip: e.target.value }))} className="mt-1 block w-full bg-[#202020] border border-gray-500 rounded px-3 py-2 text-sm text-white" required /></div>
+             <div><label className="block text-sm font-medium text-gray-300 mb-1">Port</label><input type="number" value={nodeForm.port} onChange={(e) => setNodeForm(prev => ({ ...prev, port: e.target.value }))} className="mt-1 block w-full bg-[#202020] border border-gray-500 rounded px-3 py-2 text-sm text-white" required min="1" max="65535"/></div>
              {/* Rename Capabilities to Tags */}
-             <div><label className="block text-sm font-medium text-gray-300 mb-1">Tags <span className="text-gray-500">(optional, comma-separated)</span></label><input type="text" value={nodeForm.tags} onChange={(e) => setNodeForm(prev => ({ ...prev, tags: e.target.value }))} className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white" /></div> {/* Rename capabilities to tags */}
+             <div><label className="block text-sm font-medium text-gray-300 mb-1">Tags <span className="text-gray-500">(optional, comma-separated)</span></label><input type="text" value={nodeForm.tags} onChange={(e) => setNodeForm(prev => ({ ...prev, tags: e.target.value }))} className="mt-1 block w-full bg-[#202020] border border-gray-500 rounded px-3 py-2 text-sm text-white" /></div> {/* Rename capabilities to tags */}
              {/* Conditionally render Auth Token only for 'add' mode */}
              {modalMode === 'add' && (
                <div>
@@ -873,7 +883,7 @@ export default function App() {
                         setNodeForm(prev => ({ ...prev, auth_token: e.target.value }))
                       }}
                       placeholder=""
-                      className="mt-1 block w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 text-sm text-white"
+                      className="mt-1 block w-full bg-[#202020] border border-gray-500 rounded px-3 py-2 text-sm text-white"
                       required={modalMode === 'add'} // Only required when adding
                       autoComplete="current-password" // Add autocomplete attribute
                   />
@@ -882,7 +892,7 @@ export default function App() {
             <div className="flex justify-end gap-2 pt-2">
               <button type="button" onClick={() => setModalType(null)} className="px-4 py-2 text-sm text-gray-300 hover:text-white">Cancel</button>
               {/* Dynamic button text */}
-              <button type="submit" className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-400 rounded text-white">
+              <button type="submit" className="px-4 py-2 text-sm bg-[#c6441a] hover:bg-[#c6441a] rounded text-white">
                 {modalMode === 'edit' ? 'Update Node' : 'Add Node'}
               </button>
             </div>
@@ -898,7 +908,7 @@ export default function App() {
             ) : (
               <div className="space-y-2 max-h-60 overflow-y-auto pr-2">
                 {nodes.map(node => (
-                  <div key={node.id} className="flex items-center justify-between p-3 bg-gray-700 rounded hover:bg-gray-600/50 transition-colors">
+                  <div key={node.id} className="flex items-center justify-between p-3 bg-[#202020] rounded hover:bg-[#202020]/50 transition-colors">
                     <div>
                       <p className="font-medium text-white">{node.id}</p>
                       <p className="text-sm text-gray-400">{node.ip}</p>

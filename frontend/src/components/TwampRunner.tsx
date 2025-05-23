@@ -62,76 +62,79 @@ type IpVersion = 'ipv4' | 'ipv6';
 const selectStyles: StylesConfig<NodeOption, false> = {
   control: (provided) => ({
     ...provided,
-    backgroundColor: '#374151', // bg-gray-700
-    borderColor: '#4B5563', // border-gray-600
-    color: '#D1D5DB', // text-gray-300
-    minHeight: '44px', // Adjusted slightly for text-base
+    backgroundColor: '#202020',
+    borderColor: '#6B7280', // Changed from gray-600 to gray-500
+    color: '#D1D5DB',
+    minHeight: '44px',
     boxShadow: 'none',
-    '&:hover': { borderColor: '#6B7280' }, // border-gray-500
-    fontSize: '1rem', // Explicitly set font size to text-base (16px)
+    '&:hover': { borderColor: '#6B7280' }, // Kept as gray-500
+    fontSize: '1rem',
   }),
   menu: (provided) => ({
     ...provided,
-    backgroundColor: '#1F2937', // bg-gray-800
-    borderColor: '#4B5563', // border-gray-600
+    backgroundColor: '#202020', // Changed from slate-800 to match app background
+    borderColor: '#6B7280', // Changed from gray-600 to gray-500
     zIndex: 20,
-    fontSize: '1rem', // Font size for options
+    fontSize: '1rem',
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isSelected ? '#2563EB' : state.isFocused ? '#374151' : '#1F2937',
+    backgroundColor: state.isSelected ? '#ea6508' : state.isFocused ? '#374151' : '#202020', // Orange for selected, darker gray for focus, app bg for default
     color: state.isSelected ? '#FFFFFF' : '#D1D5DB',
-    '&:active': { backgroundColor: '#1D4ED8' },
+    '&:active': { backgroundColor: '#c6441a' }, // Darker orange for active
   }),
   singleValue: (provided) => ({
     ...provided,
-    color: '#F9FAFB', // text-gray-100
+    color: '#F9FAFB',
   }),
   input: (provided) => ({
     ...provided,
-    color: '#F9FAFB', // text-gray-100
+    color: '#F9FAFB',
   }),
   placeholder: (provided) => ({
     ...provided,
-    color: '#9CA3AF', // text-gray-400
+    color: '#9CA3AF',
   }),
   indicatorSeparator: (provided) => ({
     ...provided,
-    backgroundColor: '#4B5563', // border-gray-600
+    backgroundColor: '#6B7280', // Changed from gray-600 to gray-500
   }),
   dropdownIndicator: (provided) => ({
     ...provided,
-    color: '#9CA3AF', // text-gray-400
-    '&:hover': { color: '#D1D5DB' }, // text-gray-300
+    color: '#9CA3AF',
+    '&:hover': { color: '#D1D5DB' },
   }),
   clearIndicator: (provided) => ({
     ...provided,
-    color: '#9CA3AF', // text-gray-400
-    '&:hover': { color: '#EF4444' }, // text-red-500
+    color: '#9CA3AF',
+    '&:hover': { color: '#EF4444' },
   }),
 };
+
 const selectTheme = (theme: Theme): Theme => ({
   ...theme,
-  borderRadius: 6, // Match rounded-md
+  borderRadius: 6,
   colors: {
     ...theme.colors,
-    primary: '#2563EB', // Blue-600 for focus ring/selection
-    primary75: '#3B82F6',
-    primary50: '#60A5FA',
-    primary25: '#93C5FD',
-    danger: '#EF4444', // Red-500
-    dangerLight: '#F87171', // Red-400
-    neutral0: '#1F2937', // bg-gray-800 (menu background)
-    neutral5: '#374151', // bg-gray-700 (control background)
-    neutral10: '#4B5563', // border-gray-600
-    neutral20: '#6B7280', // border-gray-500 (hover border)
-    neutral30: '#9CA3AF', // text-gray-400 (placeholder)
-    neutral40: '#9CA3AF',
-    neutral50: '#9CA3AF',
-    neutral60: '#D1D5DB', // text-gray-300
-    neutral70: '#E5E7EB', // text-gray-200
-    neutral80: '#F9FAFB', // text-gray-100 (input/selected value)
-    neutral90: '#FFFFFF', // text-white
+    primary: '#ea6508', // Main orange
+    primary75: '#c6441a', // Darker orange for active states or intense focus
+    primary50: '#ea6508', // Medium orange (can be same as primary)
+    primary25: '#f97316', // Lighter orange (Tailwind orange-500) for hover/focus accents
+
+    danger: '#EF4444',
+    dangerLight: '#F87171',
+
+    neutral0: '#202020',  // Menu background
+    neutral5: '#202020',  // Control background
+    neutral10: '#6B7280', // Control border (gray-500)
+    neutral20: '#6B7280', // Control hover border, indicators (gray-500)
+    neutral30: '#9CA3AF', // Placeholder text (gray-400)
+    neutral40: '#9CA3AF', // Used for text sometimes
+    neutral50: '#9CA3AF', // Disabled text
+    neutral60: '#D1D5DB', // Default text (gray-300)
+    neutral70: '#E5E7EB', // Lighter text (gray-200)
+    neutral80: '#F9FAFB', // Input text, selected value text (gray-100)
+    neutral90: '#FFFFFF', // Text on primary background (white)
   },
 });
 
@@ -723,7 +726,7 @@ Settings used:
 
   // --- JSX Rendering ---
   return (
-    <div className="p-4 bg-gray-800 rounded-lg shadow-md border border-gray-700 text-gray-300">
+    <div className="p-4 bg-[#202020] rounded-lg shadow-md border border-gray-500 text-gray-300">
       <h2 className="text-xl font-semibold mb-4 text-white">Ad-hoc RFC5357 Benchmark:</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -765,8 +768,8 @@ Settings used:
           <div>
             <label className="block text-sm font-medium mb-1">IP Version:</label>
             <div className="flex rounded-md shadow-sm">
-              <button type="button" onClick={() => setIpVersion('ipv4')} className={`px-4 py-2 border border-gray-600 rounded-l-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 ${ipVersion === 'ipv4' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>IPv4</button>
-              <button type="button" onClick={() => setIpVersion('ipv6')} className={`px-4 py-2 border-t border-b border-r border-gray-600 rounded-r-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 ${ipVersion === 'ipv6' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'}`}>IPv6</button>
+              <button type="button" onClick={() => setIpVersion('ipv4')} className={`px-4 py-2 border border-gray-500 rounded-l-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#c6441a] ${ipVersion === 'ipv4' ? 'bg-[#c6441a] text-white' : 'bg-[#202020] hover:bg-[#202020]'}`}>IPv4</button>
+              <button type="button" onClick={() => setIpVersion('ipv6')} className={`px-4 py-2 border-t border-b border-r border-gray-500 rounded-r-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#c6441a] ${ipVersion === 'ipv6' ? 'bg-[#c6441a] text-white' : 'bg-[#202020] hover:bg-[#202020]'}`}>IPv6</button>
             </div>
           </div>
 
@@ -778,8 +781,8 @@ Settings used:
                 type="button"
                 onClick={() => setDoNotFragment(true)}
                 disabled={ipVersion === 'ipv6'} // Disable if IPv6
-                className={`px-4 py-2 border border-gray-600 rounded-l-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  doNotFragment && ipVersion === 'ipv4' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'
+                className={`px-4 py-2 border border-gray-500 rounded-l-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#c6441a] disabled:opacity-50 disabled:cursor-not-allowed ${
+                  doNotFragment && ipVersion === 'ipv4' ? 'bg-[#c6441a] text-white' : 'bg-[#202020] hover:bg-[#202020]'
                 }`}
               >
                 Set
@@ -788,8 +791,8 @@ Settings used:
                 type="button"
                 onClick={() => setDoNotFragment(false)}
                 disabled={ipVersion === 'ipv6'} // Disable if IPv6
-                className={`px-4 py-2 border-t border-b border-r border-gray-600 rounded-r-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  !doNotFragment && ipVersion === 'ipv4' ? 'bg-blue-600 text-white' : 'bg-gray-700 hover:bg-gray-600'
+                className={`px-4 py-2 border-t border-b border-r border-gray-500 rounded-r-md text-sm font-medium focus:outline-none focus:ring-1 focus:ring-[#c6441a] disabled:opacity-50 disabled:cursor-not-allowed ${
+                  !doNotFragment && ipVersion === 'ipv4' ? 'bg-[#c6441a] text-white' : 'bg-[#202020] hover:bg-[#202020]'
                 }`}
               >
                 Clear
@@ -801,17 +804,17 @@ Settings used:
           {/* Port */}
           <div>
             <label htmlFor="port" className="block text-sm font-medium mb-1">Port:</label>
-            <input type="number" id="port" value={port} onChange={(e) => setPort(e.target.value)} min="1024" max="65535" required className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="port" value={port} onChange={(e) => setPort(e.target.value)} min="1024" max="65535" required className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
           {/* Count */}
           <div>
             <label htmlFor="count" className="block text-sm font-medium mb-1">Count:</label>
-            <input type="number" id="count" value={count} onChange={(e) => setCount(e.target.value)} min="1" max="10000" required className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="count" value={count} onChange={(e) => setCount(e.target.value)} min="1" max="10000" required className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
           {/* Interval */}
           <div>
             <label htmlFor="interval" className="block text-sm font-medium mb-1">Interval (ms):</label>
-            <input type="number" id="interval" value={interval} onChange={(e) => setIntervalValue(e.target.value)} min="10" max="10000" required className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="interval" value={interval} onChange={(e) => setIntervalValue(e.target.value)} min="10" max="10000" required className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
         </div>
 
@@ -821,26 +824,26 @@ Settings used:
           {/* Padding */}
           <div>
             <label htmlFor="padding" className="block text-sm font-medium mb-1">Padding (bytes):</label>
-            <input type="number" id="padding" value={padding} onChange={(e) => setPadding(e.target.value)} min="0" max="9000" className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="padding" value={padding} onChange={(e) => setPadding(e.target.value)} min="0" max="9000" className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
           {/* TTL */}
           <div>
             <label htmlFor="ttl" className="block text-sm font-medium mb-1">TTL:</label>
-            <input type="number" id="ttl" value={ttl} onChange={(e) => setTtl(e.target.value)} min="1" max="255" className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="ttl" value={ttl} onChange={(e) => setTtl(e.target.value)} min="1" max="255" className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
           {/* ToS */}
           <div>
             <label htmlFor="tos" className="block text-sm font-medium mb-1">ToS/DSCP:</label>
-            <input type="number" id="tos" value={tos} onChange={(e) => setTos(e.target.value)} min="0" max="255" className="w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-blue-500 focus:border-blue-500 text-sm" />
+            <input type="number" id="tos" value={tos} onChange={(e) => setTos(e.target.value)} min="0" max="255" className="w-full p-2 bg-[#202020] border border-gray-500 rounded-md focus:ring-[#c6441a] focus:border-[#c6441a] text-sm" />
           </div>
           {/* --- MOVED: Run/Stop Buttons --- */}
           {/* Make buttons span the remaining space or adjust grid as needed */}
           <div className="flex space-x-4 md:col-span-1"> {/* Adjust col-span if needed */}
-             <button type="submit" disabled={isLoading} className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed">
+             <button type="submit" disabled={isLoading} className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#c6441a] hover:bg-[#c6441a] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#c6441a] disabled:opacity-50 disabled:cursor-not-allowed">
                <ClipLoader size={20} color={"#ffffff"} loading={isLoading} className="mr-2" />
                {isLoading ? 'Running...' : 'Run'} {/* Shortened text */}
              </button>
-             <button type="button" onClick={handleStopClick} disabled={!isLoading} className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-600 text-sm font-medium rounded-md shadow-sm text-gray-300 bg-gray-700 hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed">
+             <button type="button" onClick={handleStopClick} disabled={!isLoading} className="flex-1 inline-flex justify-center items-center px-4 py-2 border border-gray-500 text-sm font-medium rounded-md shadow-sm text-gray-300 bg-[#202020] hover:bg-[#202020] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 disabled:opacity-50 disabled:cursor-not-allowed">
                Stop
              </button>
           </div>
@@ -852,14 +855,14 @@ Settings used:
 
       {/* Progress Bar */}
       {isLoading && (
-        <div className="mt-4 w-full bg-gray-600 rounded-full h-2.5">
+        <div className="mt-4 w-full bg-[#202020] rounded-full h-2.5">
           <div className="bg-green-600 h-2.5 rounded-full" style={{ width: `${progress}%` }}></div>
         </div>
       )}
 
       {/* Status Message */}
       {statusMessage && (
-        <div className="mt-4 p-3 bg-gray-700 border border-gray-600 rounded-md text-sm">
+        <div className="mt-4 p-3 bg-[#202020] border border-gray-500 rounded-md text-sm">
           {statusMessage}
         </div>
       )}
@@ -875,7 +878,7 @@ Settings used:
       {(output || error) && ( // Show output area if there's output OR an error
         <div className="mt-4">
           <h3 className="text-lg font-semibold mb-2 text-white">Output:</h3>
-          <pre className="p-3 bg-gray-900 border border-gray-700 rounded-md text-sm text-gray-300 whitespace-pre-wrap overflow-x-auto">
+          <pre className="p-3 bg-[#202020] border border-gray-500 rounded-md text-sm text-gray-300 whitespace-pre-wrap overflow-x-auto">
             {output}
           </pre>
         </div>
