@@ -16,9 +16,3 @@ sphinx:
 formats:
   - pdf
   - epub
-
-python:
-  install:
-    - requirements: backend/requirements-docs.txt
-    - method: pip
-      path: backend
