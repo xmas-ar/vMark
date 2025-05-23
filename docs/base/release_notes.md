@@ -1,3 +1,14 @@
+# vMark Release Notes - v0.1.5
+
+**New Features:**
+- eBPF Rule Manager (under Automation): Enables advanced management of forwarding rules across vMark-node instances.
+- E-Line Service Manager (under Automation): Introduces an abstraction layer for service delivery, paving the way for future orchestration and benchmarking features.
+- UI Revamp: Introduced a new visual theme and updated branding with the redesigned vMark logo.
+
+**Improvements:**
+
+- General bug fixing and QOL improvements (filters, buttons).
+
 # vMark Release Notes - v0.1.4
 
 **New Features:**

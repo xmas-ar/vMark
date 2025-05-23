@@ -17,6 +17,8 @@ COPY frontend/ ./
 # Limpieza opcional para evitar errores de binarios nativos (por bug de npm)
 RUN rm -rf node_modules package-lock.json \
  && npm install --legacy-peer-deps
+RUN npm install react-draggable
+RUN npm install reactflow
 
 # Build the frontend
 RUN npm run build
