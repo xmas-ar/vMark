@@ -19,8 +19,6 @@ formats:
 
 python:
   install:
-    - requirements: docs/requirements.txt
+    - requirements: backend/requirements.txt
     - method: pip
-      path: .
-      extra_requirements:
-        - docs
+      path: backend
