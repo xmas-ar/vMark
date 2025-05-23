@@ -1,9 +1,26 @@
-# Read the Docs configuration file
-# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+# .readthedocs.yaml
+# Archivo de configuración para Read the Docs
+# Más detalles en: https://docs.readthedocs.io/en/stable/config-file/v2.html
 
-# Required
 version: 2
 
-# Build documentation in the "docs/" directory with Sphinx
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.12"
+
 sphinx:
-   configuration: docs/conf.py
+  configuration: docs/conf.py
+  fail_on_warning: true
+
+formats:
+  - pdf
+  - epub
+
+python:
+  install:
+    - requirements: docs/requirements.txt
+    - method: pip
+      path: .
+      extra_requirements:
+        - docs
