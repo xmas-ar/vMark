@@ -5,12 +5,12 @@
 <p align="center">Latest version: 0.1.5 / Release notes: <a href="https://github.com/xmas-ar/vMark/blob/main/docs/base/release_notes.md">Link</a> / News at: <a href="https://linkedin.com/company/pathgate">LinkedIn</a> </p></p>
 
 **🚀 Features:**
-- Ad-hoc RFC 5357 (TWAMP) Benchmarks
+- Ad-hoc **RFC 5357 (TWAMP)** Benchmarks
 - Node Management
 - Heartbeat sensor (last 24hs)
 - Node Filtering & Tags-based Search.
-- Docker deployment.
-- Remote vMark MEF E-line services deployment (eBPF/XDP). (v0.1.5)
+- **Docker** deployment.
+- Remote vMark **MEF E-line services deployment** (eBPF/XDP). (v0.1.5)
 
 
 <details>
