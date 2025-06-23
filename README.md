@@ -46,7 +46,7 @@
   
   5. Protocol Support and Flexibility
   
-  - IPv4 and IPv6
+  - DPDK/VPP
   - VLAN, QinQ, MPLS, Segment Routing aware
   - Option for encrypted link testing (IPSec, MACsec links)
   - MEF3 compliance.
