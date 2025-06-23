@@ -77,12 +77,11 @@
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/cfe836e6-2b9e-4695-a502-19ef61775026" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/223e165c-bd16-4fc6-9ac7-9a233ea42c23" alt="xxx">
 </p>
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/58a1e087-bd42-4ad8-9656-589c1f9c29bb" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/048778a4-fe34-4be9-b9fd-7618f5beb1ed" alt="xxx">
 </p>
-
 
 <h1 align="center"># Architecture</h1>
 
