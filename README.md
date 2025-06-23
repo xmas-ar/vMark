@@ -77,8 +77,12 @@
 
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/2bfc5e61-3e14-4f90-81e4-c1773381a456" alt="xxx">
+  <img src="https://github.com/user-attachments/assets/cfe836e6-2b9e-4695-a502-19ef61775026" alt="xxx">
 </p>
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/58a1e087-bd42-4ad8-9656-589c1f9c29bb" alt="xxx">
+</p>
+
 
 <h1 align="center"># Architecture</h1>
 
